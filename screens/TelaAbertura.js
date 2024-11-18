@@ -12,7 +12,7 @@ function TelaAbertura() {
   });
 
   if (!fontsLoaded) {
-    return null; // Ou um indicador de carregamento
+    return null;
   }
 
   return (
