@@ -1,20 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import TelaAbertura from './screens/TelaAbertura';
+import TelaLogin from './screens/TelaLogin';
+import TelaRegisto from './screens/TelaRegistro';
+import { NavigationContainer } from '@react-navigation/native';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Opening" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Opening" component={TelaAbertura} />
+        <Stack.Screen name="Login" component={TelaLogin} />
+        <Stack.Screen name="Register" component={TelaRegisto} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
