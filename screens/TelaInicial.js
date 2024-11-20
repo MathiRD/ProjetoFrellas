@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import NavBar from '../src/components/NavBar'; // Importando a NavBar
 
 function ServiceCard({ title, imageSource, status }) {
   return (
@@ -17,87 +17,90 @@ function TelaInicial() {
   const navigation = useNavigation();
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Mapa Placeholder */}
-      <View style={styles.mapContainer}>
-        <Text style={styles.mapText}>Mapa - Aqui será o mapa interativo</Text>
-      </View>
+    <View style={styles.container}>
+      <ScrollView>
+        {/* Mapa Placeholder */}
+        <View style={styles.mapContainer}>
+          <Text style={styles.mapText}>Mapa - Aqui será o mapa interativo</Text>
+        </View>
 
-      {/* Serviços em Destaque */}
-      <Text style={styles.sectionTitle}>Serviços em Destaque</Text>
-      <ScrollView horizontal style={styles.servicesContainer}>
-        <ServiceCard 
-          title="Faz Tudo" 
-          status="Aberto" 
-        />
-        <ServiceCard 
-          title="Eletrecista" 
-          status="Aberto" 
-        />
-        <ServiceCard 
-          title="Encanador" 
-          status="Aberto" 
-        />
-        <ServiceCard 
-          title="Mecânico" 
-          status="Aberto" 
-        />
+        {/* Serviços em Destaque */}
+        <Text style={styles.sectionTitle}>Serviços em Destaque</Text>
+        <ScrollView horizontal style={styles.servicesContainer}>
+          <ServiceCard 
+            title="Faz Tudo" 
+            status="Aberto" 
+          />
+          <ServiceCard 
+            title="Eletrecista" 
+            status="Aberto" 
+          />
+          <ServiceCard 
+            title="Encanador" 
+            status="Aberto" 
+          />
+          <ServiceCard 
+            title="Mecânico" 
+            status="Aberto" 
+          />
+        </ScrollView>
+
+        {/* Barra de Busca */}
+        <View style={styles.searchContainer}>
+          <TextInput 
+            style={styles.searchInput} 
+            placeholder="Encontrar Serviços" 
+          />
+        </View>
+
+        {/* Populares */}
+        <Text style={styles.sectionTitle}>Popular</Text>
+        <ScrollView style={styles.popularContainer}>
+          <View style={styles.popularCard}>
+            <Image 
+              style={styles.popularImage} 
+            />
+            <View style={styles.popularTextContainer}>
+              <Text style={styles.popularTitle}>Serviço a 2 anos no mercado</Text>
+              <Text style={styles.popularDescription}>Serviço altamente recomendado pelos clientes.</Text>
+            </View>
+          </View>
+
+          <View style={styles.popularCard}>
+            <Image 
+              style={styles.popularImage} 
+            />
+            <View style={styles.popularTextContainer}>
+              <Text style={styles.popularTitle}>Outro Serviço Popular</Text>
+              <Text style={styles.popularDescription}>Com ótima reputação e atendendo diversas demandas.</Text>
+            </View>
+          </View>
+
+          <View style={styles.popularCard}>
+            <Image 
+              style={styles.popularImage} 
+            />
+            <View style={styles.popularTextContainer}>
+              <Text style={styles.popularTitle}>Outro Serviço Popular</Text>
+              <Text style={styles.popularDescription}>Com ótima reputação e atendendo diversas demandas.</Text>
+            </View>
+          </View>
+
+          <View style={styles.popularCard}>
+            <Image 
+              style={styles.popularImage} 
+            />
+            <View style={styles.popularTextContainer}>
+              <Text style={styles.popularTitle}>Outro Serviço Popular</Text>
+              <Text style={styles.popularDescription}>Com ótima reputação e atendendo diversas demandas.</Text>
+            </View>
+          </View>
+        </ScrollView>
       </ScrollView>
-
-      {/* Barra de Busca */}
-      <View style={styles.searchContainer}>
-        <TextInput 
-          style={styles.searchInput} 
-          placeholder="Encontrar Serviços" 
-        />
-      </View>
-
-      {/* Populares */}
-      <Text style={styles.sectionTitle}>Popular</Text>
-      <ScrollView style={styles.popularContainer}>
-        <View style={styles.popularCard}>
-          <Image 
-            style={styles.popularImage} 
-          />
-          <View style={styles.popularTextContainer}>
-            <Text style={styles.popularTitle}>Serviço a 2 anos no mercado</Text>
-            <Text style={styles.popularDescription}>Serviço altamente recomendado pelos clientes.</Text>
-          </View>
-        </View>
-
-        <View style={styles.popularCard}>
-          <Image 
-            style={styles.popularImage} 
-          />
-          <View style={styles.popularTextContainer}>
-            <Text style={styles.popularTitle}>Outro Serviço Popular</Text>
-            <Text style={styles.popularDescription}>Com ótima reputação e atendendo diversas demandas.</Text>
-          </View>
-        </View>
-
-        {/* Adicionando mais itens populares */}
-        <View style={styles.popularCard}>
-          <Image 
-            style={styles.popularImage} 
-          />
-          <View style={styles.popularTextContainer}>
-            <Text style={styles.popularTitle}>Outro Serviço Popular</Text>
-            <Text style={styles.popularDescription}>Com ótima reputação e atendendo diversas demandas.</Text>
-          </View>
-        </View>
-
-        <View style={styles.popularCard}>
-          <Image 
-            style={styles.popularImage} 
-          />
-          <View style={styles.popularTextContainer}>
-            <Text style={styles.popularTitle}>Outro Serviço Popular</Text>
-            <Text style={styles.popularDescription}>Com ótima reputação e atendendo diversas demandas.</Text>
-          </View>
-        </View>
-        
-      </ScrollView>
-    </ScrollView>
+      
+      {/* Adicionando a NavBar */}
+      <NavBar activeTab="home" />
+    </View>
   );
 }
 
@@ -105,7 +108,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFF',
-    padding: 10,
   },
   mapContainer: {
     height: 200,
@@ -157,10 +159,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingLeft: 10,
   },
-  // Popular Section Styles
   popularContainer: {
     marginTop: 20,
-    maxHeight: 300, // Definindo altura máxima para a área "Popular"
+    maxHeight: 300,
   },
   popularCard: {
     flexDirection: 'row',
