@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import NavBar from '../src/components/NavBar'; // Importando a NavBar
 
 function ServiceCard({ title, imageSource, status }) {
   return (
@@ -19,12 +18,10 @@ function TelaInicial() {
   return (
     <View style={styles.container}>
       <ScrollView>
-        {/* Mapa Placeholder */}
         <View style={styles.mapContainer}>
           <Text style={styles.mapText}>Mapa - Aqui será o mapa interativo</Text>
         </View>
 
-        {/* Serviços em Destaque */}
         <Text style={styles.sectionTitle}>Serviços em Destaque</Text>
         <ScrollView horizontal style={styles.servicesContainer}>
           <ServiceCard 
@@ -45,7 +42,6 @@ function TelaInicial() {
           />
         </ScrollView>
 
-        {/* Barra de Busca */}
         <View style={styles.searchContainer}>
           <TextInput 
             style={styles.searchInput} 
@@ -53,7 +49,6 @@ function TelaInicial() {
           />
         </View>
 
-        {/* Populares */}
         <Text style={styles.sectionTitle}>Popular</Text>
         <ScrollView style={styles.popularContainer}>
           <View style={styles.popularCard}>
@@ -97,9 +92,6 @@ function TelaInicial() {
           </View>
         </ScrollView>
       </ScrollView>
-      
-      {/* Adicionando a NavBar */}
-      <NavBar activeTab="home" />
     </View>
   );
 }

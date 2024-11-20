@@ -21,15 +21,15 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginTop: 20,
     marginBottom: 20,
-    overflow: 'hidden', // Adicionado para garantir que o gradiente respeite os cantos arredondados
+    overflow: 'hidden',
   },
   gradient: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 25,
-    width: '100%', // Adicionado para garantir que o gradiente preencha o botão
-    height: '100%', // Adicionado para garantir que o gradiente preencha o botão
+    width: '100%',
+    height: '100%',
   },
   text: {
     color: '#FFFFFF',

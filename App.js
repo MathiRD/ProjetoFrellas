@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TelaAbertura from './screens/TelaAbertura';
 import TelaLogin from './screens/TelaLogin';
 import TelaRegisto from './screens/TelaRegistro';
-import TelaInicial from './screens/TelaInicial'; 
+import Routes from './src/NavBar';
 import { NavigationContainer } from '@react-navigation/native';
 
 const Stack = createNativeStackNavigator();
@@ -15,7 +15,7 @@ export default function App() {
         <Stack.Screen name="Opening" component={TelaAbertura} />
         <Stack.Screen name="Login" component={TelaLogin} />
         <Stack.Screen name="Register" component={TelaRegisto} />
-        <Stack.Screen name="Home" component={TelaInicial} /> 
+        <Stack.Screen name="Home" component={Routes} />
       </Stack.Navigator>
     </NavigationContainer>
   );
