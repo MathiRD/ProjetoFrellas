@@ -1,28 +1,24 @@
-
 import React from 'react';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
 import CustomButton from '../src/components/CustomButton';
 
-function TelaLogin() {
-  return React.createElement(
-    View,
-    { style: styles.container },
-    React.createElement(Text, { style: styles.label }, 'Nome'),
-    React.createElement(TextInput, {
-      style: styles.input,
-      placeholder: 'Digite seu nome',
-    }),
-    React.createElement(Text, { style: styles.label }, 'Senha'),
-    React.createElement(TextInput, {
-      style: styles.input,
-      placeholder: 'Digite sua senha',
-      secureTextEntry: true,
-    }),
-    React.createElement(Text, { style: styles.forgotPassword }, 'Recuperar senha'),
-    React.createElement(CustomButton, {
-      title: 'Entrar',
-      onPress: () => {},
-    })
+function TelaLogin({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.label}>Nome</Text>
+      <TextInput style={styles.input} placeholder="Digite seu nome" />
+      <Text style={styles.label}>Senha</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Digite sua senha"
+        secureTextEntry
+      />
+      <Text style={styles.forgotPassword}>Recuperar senha</Text>
+      <CustomButton
+        title="Entrar"
+        onPress={() => navigation.navigate('Home')} 
+      />
+    </View>
   );
 }
 
