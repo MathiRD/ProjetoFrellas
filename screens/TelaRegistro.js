@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Alert, ActivityIndicator } from 'react-native';
 import CustomButton from '../src/components/CustomButton';
 import Supabase from '../src/SupabaseClient';
 
@@ -9,9 +9,11 @@ function TelaRegistro({ navigation }) {
   const [senha, setSenha] = useState('');
   const [confirmaSenha, setConfirmaSenha] = useState('');
   const [erroCampos, setErroCampos] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
     setErroCampos({});
+    setLoading(true);
 
     if (!nome || !email || !senha || !confirmaSenha) {
       setErroCampos((prev) => ({
@@ -21,6 +23,7 @@ function TelaRegistro({ navigation }) {
         ...(senha ? {} : { senha: 'Este campo é obrigatório' }),
         ...(confirmaSenha ? {} : { confirmaSenha: 'Este campo é obrigatório' }),
       }));
+      setLoading(false);
       return;
     }
 
@@ -30,6 +33,7 @@ function TelaRegistro({ navigation }) {
         senha: 'As senhas não coincidem',
         confirmaSenha: 'As senhas não coincidem',
       }));
+      setLoading(false);
       return;
     }
 
@@ -44,6 +48,8 @@ function TelaRegistro({ navigation }) {
       Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
       navigation.navigate('Login');
     }
+
+    setLoading(false);
   };
 
   return (
@@ -89,6 +95,11 @@ function TelaRegistro({ navigation }) {
       )}
 
       <CustomButton title="Registrar" onPress={handleRegister} />
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#ffffff" />
+        </View>
+      )}
     </View>
   );
 }
@@ -115,6 +126,16 @@ const styles = StyleSheet.create({
     color: '#FF0000',
     fontSize: 12,
     marginBottom: 10,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
