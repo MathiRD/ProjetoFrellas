@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Alert, ActivityIndicator, ImageBackground, Image, Platform, KeyboardAvoidingView } from 'react-native';
+import { useFonts, Abel_400Regular } from '@expo-google-fonts/abel';
 import CustomButton from '../src/components/CustomButton';
 import Supabase from '../src/SupabaseClient';
 
@@ -10,6 +11,14 @@ function TelaRegistro({ navigation }) {
   const [confirmaSenha, setConfirmaSenha] = useState('');
   const [erroCampos, setErroCampos] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const [fontsLoaded] = useFonts({
+    Abel_400Regular,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   const handleRegister = async () => {
     setErroCampos({});
@@ -53,54 +62,66 @@ function TelaRegistro({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Nome</Text>
-      <TextInput
-        style={[styles.input, erroCampos.nome && { borderColor: '#FF0000' }]}
-        placeholder="Digite seu nome"
-        value={nome}
-        onChangeText={setNome}
-      />
-      {erroCampos.nome && <Text style={styles.errorText}>{erroCampos.nome}</Text>}
+    <ImageBackground source={require('../assets/backgroundFrellas.png')} style={styles.imagemFundo}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <View style={styles.innerContainer}>
+          <Image source={require('../assets/iconFrellas.png')} style={styles.logo} />
+          <Text style={styles.title}>FRELLAS</Text>
 
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={[styles.input, erroCampos.email && { borderColor: '#FF0000' }]}
-        placeholder="Digite seu email"
-        value={email}
-        onChangeText={setEmail}
-      />
-      {erroCampos.email && <Text style={styles.errorText}>{erroCampos.email}</Text>}
+          <Text style={styles.label}>Nome:</Text>
+          <TextInput
+            style={[styles.input, erroCampos.nome && { borderColor: '#FF0000' }]}
+            placeholder="Digite seu nome"
+            value={nome}
+            onChangeText={setNome}
+          />
+          {erroCampos.nome && <Text style={styles.errorText}>{erroCampos.nome}</Text>}
 
-      <Text style={styles.label}>Senha</Text>
-      <TextInput
-        style={[styles.input, erroCampos.senha && { borderColor: '#FF0000' }]}
-        placeholder="Digite sua senha"
-        secureTextEntry
-        value={senha}
-        onChangeText={setSenha}
-      />
-      {erroCampos.senha && <Text style={styles.errorText}>{erroCampos.senha}</Text>}
+          <Text style={styles.label}>Email:</Text>
+          <TextInput
+            style={[styles.input, erroCampos.email && { borderColor: '#FF0000' }]}
+            placeholder="Digite seu email"
+            value={email}
+            onChangeText={setEmail}
+          />
+          {erroCampos.email && <Text style={styles.errorText}>{erroCampos.email}</Text>}
 
-      <Text style={styles.label}>Confirme a senha</Text>
-      <TextInput
-        style={[styles.input, erroCampos.confirmaSenha && { borderColor: '#FF0000' }]}
-        placeholder="Confirme sua senha"
-        secureTextEntry
-        value={confirmaSenha}
-        onChangeText={setConfirmaSenha}
-      />
-      {erroCampos.confirmaSenha && (
-        <Text style={styles.errorText}>{erroCampos.confirmaSenha}</Text>
-      )}
+          <Text style={styles.label}>Senha:</Text>
+          <TextInput
+            style={[styles.input, erroCampos.senha && { borderColor: '#FF0000' }]}
+            placeholder="Digite sua senha"
+            secureTextEntry
+            value={senha}
+            onChangeText={setSenha}
+          />
+          {erroCampos.senha && <Text style={styles.errorText}>{erroCampos.senha}</Text>}
 
-      <CustomButton title="Registrar" onPress={handleRegister} />
-      {loading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#ffffff" />
+          <Text style={styles.label}>Confirme a senha:</Text>
+          <TextInput
+            style={[styles.input, erroCampos.confirmaSenha && { borderColor: '#FF0000' }]}
+            placeholder="Confirme sua senha"
+            secureTextEntry
+            value={confirmaSenha}
+            onChangeText={setConfirmaSenha}
+          />
+          {erroCampos.confirmaSenha && (
+            <Text style={styles.errorText}>{erroCampos.confirmaSenha}</Text>
+          )}
+
+          <CustomButton title="Registrar" onPress={handleRegister} />
+
+          {loading && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color="#ffffff" />
+            </View>
+          )}
         </View>
-      )}
-    </View>
+      </KeyboardAvoidingView>
+    </ImageBackground>
   );
 }
 
@@ -109,18 +130,44 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#E0F7FA',
+    width: '100%',
+  },
+  imagemFundo: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    width: '100%',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 200, 
+    height: 200,
+    marginBottom: 20, 
+  },
+  title: {
+    fontSize: 80,
+    fontFamily: 'Abel_400Regular',
+    color: '#808080',
+    marginBottom: 50,
   },
   label: {
     fontSize: 16,
     marginBottom: 5,
+    textAlign: 'left', // Alinhamento para garantir que a label "Confirme a senha" fique no mesmo alinhamento
+    width: '100%',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#000', // Alterado para preto
     padding: 10,
     marginBottom: 15,
     borderRadius: 5,
+    width: '100%',
   },
   errorText: {
     color: '#FF0000',

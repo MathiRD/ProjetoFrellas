@@ -17,6 +17,7 @@ function TelaInicial() {
 
   return (
     <View style={styles.container}>
+      {/* Conteúdo principal */}
       <ScrollView>
         <View style={styles.mapContainer}>
           <Text style={styles.mapText}>Mapa - Aqui será o mapa interativo</Text>
@@ -29,7 +30,7 @@ function TelaInicial() {
             status="Aberto" 
           />
           <ServiceCard 
-            title="Eletrecista" 
+            title="Eletricista" 
             status="Aberto" 
           />
           <ServiceCard 
@@ -46,14 +47,19 @@ function TelaInicial() {
           <TextInput 
             style={styles.searchInput} 
             placeholder="Encontrar Serviços" 
+            
           />
         </View>
+      </ScrollView>
 
-        <Text style={styles.sectionTitle}>Popular</Text>
-        <ScrollView style={styles.popularContainer}>
+      {/* Seção Populares com scroll vertical independente */}
+      <View style={styles.popularesContainer}>
+        <Text style={styles.sectionTitle}>Populares</Text>
+        <ScrollView style={styles.popularScroll}>
           <View style={styles.popularCard}>
             <Image 
               style={styles.popularImage} 
+              source={{ uri: 'https://via.placeholder.com/120' }} 
             />
             <View style={styles.popularTextContainer}>
               <Text style={styles.popularTitle}>Serviço a 2 anos no mercado</Text>
@@ -64,6 +70,7 @@ function TelaInicial() {
           <View style={styles.popularCard}>
             <Image 
               style={styles.popularImage} 
+              source={{ uri: 'https://via.placeholder.com/120' }} 
             />
             <View style={styles.popularTextContainer}>
               <Text style={styles.popularTitle}>Outro Serviço Popular</Text>
@@ -74,16 +81,7 @@ function TelaInicial() {
           <View style={styles.popularCard}>
             <Image 
               style={styles.popularImage} 
-            />
-            <View style={styles.popularTextContainer}>
-              <Text style={styles.popularTitle}>Outro Serviço Popular</Text>
-              <Text style={styles.popularDescription}>Com ótima reputação e atendendo diversas demandas.</Text>
-            </View>
-          </View>
-
-          <View style={styles.popularCard}>
-            <Image 
-              style={styles.popularImage} 
+              source={{ uri: 'https://via.placeholder.com/120' }} 
             />
             <View style={styles.popularTextContainer}>
               <Text style={styles.popularTitle}>Outro Serviço Popular</Text>
@@ -91,7 +89,7 @@ function TelaInicial() {
             </View>
           </View>
         </ScrollView>
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -102,7 +100,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
   mapContainer: {
-    height: 200,
+    height: 400,
     backgroundColor: '#ccc',
     justifyContent: 'center',
     alignItems: 'center',
@@ -115,9 +113,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginVertical: 10,
+    paddingHorizontal: 10,
   },
   servicesContainer: {
     flexDirection: 'row',
+    paddingHorizontal: 10,
   },
   card: {
     width: 150,
@@ -143,17 +143,26 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     marginVertical: 20,
+    paddingHorizontal: 10,
   },
   searchInput: {
-    height: 40,
+    height: 50,
     borderColor: '#ddd',
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 10,
     paddingLeft: 10,
   },
-  popularContainer: {
-    marginTop: 20,
-    maxHeight: 300,
+  popularesContainer: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.2,
+    paddingHorizontal: 10,
+    paddingTop: 1,
   },
   popularCard: {
     flexDirection: 'row',
@@ -170,6 +179,7 @@ const styles = StyleSheet.create({
   popularTextContainer: {
     marginLeft: 15,
     justifyContent: 'center',
+    flex: 1,
   },
   popularTitle: {
     fontSize: 18,
