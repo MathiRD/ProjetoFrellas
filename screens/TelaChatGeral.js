@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 
 const ServicosSolicitados = () => {
   const servicos = [
@@ -37,13 +37,9 @@ const ServicosSolicitados = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity>
-          <Text style={styles.voltar}>&larr;</Text>
+        <TouchableOpacity style={styles.voltar}>
+          <Text style={styles.voltarTexto}>&larr;</Text>
         </TouchableOpacity>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/50' }} // Insira o logo aqui
-          style={styles.logo}
-        />
         <Text style={styles.titulo}>Serviços Solicitados</Text>
       </View>
       <FlatList
@@ -62,25 +58,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
+    position: 'relative',
+    paddingTop: 50, 
+    paddingBottom: 20,
     borderBottomWidth: 1,
     borderColor: '#ddd',
   },
   voltar: {
+    position: 'absolute',
+    top: 70,
+    left: 15,
+  },
+  voltarTexto: {
     fontSize: 18,
     color: '#333',
-    marginRight: 8,
-  },
-  logo: {
-    width: 40,
-    height: 40,
-    marginRight: 8,
   },
   titulo: {
     fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 20, 
   },
   card: {
     padding: 16,
