@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 
-const ServicosSolicitados = () => {
+const TelaChatGeral = ( { navigation }) => {
   const servicos = [
     {
       id: '1',
@@ -28,7 +28,7 @@ const ServicosSolicitados = () => {
       <Text style={styles.categoria}>{item.categoria}</Text>
       <Text style={styles.detalhes}>{item.detalhes}</Text>
       <Text style={styles.prazo}>{item.prazo}</Text>
-      <TouchableOpacity style={styles.botao}>
+      <TouchableOpacity style={styles.botao} onPress={() => navigation.navigate("TelaChatVendedor")}>
         <Text style={styles.botaoTexto}>Falar com vendedor</Text>
       </TouchableOpacity>
     </View>
@@ -115,4 +115,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ServicosSolicitados;
+export default TelaChatGeral;
