@@ -136,7 +136,7 @@ const TelaFinanceiro = () => {
 
   return (
     <View style={styles.container}>
-      {/* Barra de pesquisa */}
+      {}
       <View style={styles.searchBar}>
         <TextInput
           style={styles.searchInput}
@@ -144,7 +144,7 @@ const TelaFinanceiro = () => {
         />
       </View>
 
-      {/* Abas */}
+      {}
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
@@ -163,18 +163,17 @@ const TelaFinanceiro = () => {
   );
 };
 
-// Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F7FA",
-    paddingTop: 16, // Espaçamento superior para o container geral
+    paddingTop: 16, 
   },
   searchBar: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     backgroundColor: "#E5E9F2",
-    marginTop: 16, // Ajuste para descer a barra de pesquisa
+    marginTop: 16, 
   },
   searchInput: {
     backgroundColor: "#FFF",
