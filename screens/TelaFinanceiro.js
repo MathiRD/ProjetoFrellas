@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, FlatList, TextInput } from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useWindowDimensions } from "react-native";
 
-// Mock dos dados
 const pagos = [
   {
     id: "1",
@@ -66,7 +65,7 @@ const pendentes = [
   },
 ];
 
-// Card personalizado
+
 const CardPagamento = ({ titulo, valor, data, status }) => (
   <View style={styles.card}>
     <View style={styles.cardHeader}>
@@ -90,7 +89,7 @@ const CardPagamento = ({ titulo, valor, data, status }) => (
   </View>
 );
 
-// Abas Pagos e Pendências
+
 const PagosTab = () => (
   <FlatList
     data={pagos}
@@ -121,7 +120,7 @@ const PendentesTab = () => (
   />
 );
 
-// Componente principal
+
 const TelaFinanceiro = () => {
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
@@ -169,11 +168,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F7FA",
+    paddingTop: 16, // Espaçamento superior para o container geral
   },
   searchBar: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     backgroundColor: "#E5E9F2",
+    marginTop: 16, // Ajuste para descer a barra de pesquisa
   },
   searchInput: {
     backgroundColor: "#FFF",
