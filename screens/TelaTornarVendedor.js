@@ -1,4 +1,3 @@
-// src/BecomeSellerScreen.js
 import React, { useState } from "react";
 import {
   View,
@@ -17,6 +16,10 @@ const TelaTornarVendedor = ({ navigation }) => {
   const [specialization, setSpecialization] = useState("");
   const [portfolioLink, setPortfolioLink] = useState("");
   const [experience, setExperience] = useState("");
+  const [certifications, setCertifications] = useState("");
+  const [languages, setLanguages] = useState("");
+  const [priceRange, setPriceRange] = useState("");
+  const [availability, setAvailability] = useState("");
 
   const handleSubmit = () => {
     console.log("Dados do vendedor enviados!");
@@ -30,7 +33,7 @@ const TelaTornarVendedor = ({ navigation }) => {
     >
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Se tornar um Vendedor</Text>
+          <Text style={styles.title}>Tornar-se um Vendedor</Text>
 
           <Text style={styles.label}>Descrição</Text>
           <TextInput
@@ -66,7 +69,41 @@ const TelaTornarVendedor = ({ navigation }) => {
             placeholder="Ex.: 5 anos como designer"
           />
 
-          <CustomButton title="Enviar para Avaliação" onPress={handleSubmit} />
+          <Text style={styles.label}>Certificações</Text>
+          <TextInput
+            style={styles.input}
+            value={certifications}
+            onChangeText={setCertifications}
+            placeholder="Ex.: Certificação Google Ads, UX Design"
+          />
+
+          <Text style={styles.label}>Idiomas que Domina</Text>
+          <TextInput
+            style={styles.input}
+            value={languages}
+            onChangeText={setLanguages}
+            placeholder="Ex.: Português, Inglês, Espanhol"
+          />
+
+          <Text style={styles.label}>Faixa de Preço</Text>
+          <TextInput
+            style={styles.input}
+            value={priceRange}
+            onChangeText={setPriceRange}
+            placeholder="Ex.: A partir de R$500"
+          />
+
+          <Text style={styles.label}>Disponibilidade</Text>
+          <TextInput
+            style={styles.input}
+            value={availability}
+            onChangeText={setAvailability}
+            placeholder="Ex.: Segunda a Sexta, das 9h às 18h"
+          />
+
+          <View style={styles.buttonContainer}>
+            <CustomButton title="Enviar para Avaliação" onPress={handleSubmit} />
+          </View>
         </ScrollView>
       </SafeAreaView>
     </KeyboardAvoidingView>
@@ -82,16 +119,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   container: {
-    flexGrow: 1, // Ajuste para garantir que o conteúdo ocupe todo o espaço
+    flexGrow: 1,
     paddingHorizontal: 20,
-    paddingTop: 50, // Ajustei para um valor mais alto e removi o paddingTop anterior
+    paddingTop: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    marginTop: 20, // Mantém o título com boa distância do topo
   },
   label: {
     fontSize: 16,
@@ -105,6 +141,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingLeft: 10,
     marginBottom: 15,
+    fontSize: 16, // Ajustado para consistência com a tela EditarPerfil
+  },
+  buttonContainer: {
+    alignItems: "center",
+    marginTop: 20,
   },
 });
 

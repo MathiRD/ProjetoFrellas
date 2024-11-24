@@ -8,16 +8,15 @@ import {
   TouchableOpacity,
 } from "react-native";
 import ImagePicker from "react-native-image-picker";
-import CustomButton from "../src/components/CustomButton";  // Botão padrão do seu projeto
+import CustomButton from "../src/components/CustomButton";
 
 const TelaPerfil = ({ navigation }) => {
-  // Dados mockados
   const mockUserData = {
     name: "Usuário Teste",
     country: "Brasil",
     region: "RS",
-    profileImageUrl: "https://example.com/default-profile.png", // Placeholder da imagem de perfil
-    coverImageUrl: "https://example.com/default-cover.png", // Placeholder da imagem de capa
+    profileImageUrl: "https://example.com/default-profile.png",
+    coverImageUrl: "https://example.com/default-cover.png",
   };
 
   const mockServices = [
@@ -38,12 +37,10 @@ const TelaPerfil = ({ navigation }) => {
     },
   ];
 
-  // Estados
   const [userData] = useState(mockUserData);
   const [services] = useState(mockServices);
   const [profileImage, setProfileImage] = useState(userData.profileImageUrl);
 
-  // Função para escolher imagem
   const chooseImage = () => {
     const options = {
       title: "Selecionar Imagem",
@@ -68,7 +65,6 @@ const TelaPerfil = ({ navigation }) => {
     <ScrollView style={styles.container}>
       {userData && (
         <View style={styles.profileContainer}>
-          {/* Imagem de capa */}
           <View style={styles.coverImageContainer}>
             <Image
               source={{ uri: userData.coverImageUrl }}
@@ -76,7 +72,6 @@ const TelaPerfil = ({ navigation }) => {
             />
           </View>
 
-          {/* Imagem de perfil */}
           <TouchableOpacity onPress={chooseImage}>
             <View style={styles.profileImageContainer}>
               <Image
@@ -93,7 +88,6 @@ const TelaPerfil = ({ navigation }) => {
             {userData.country}, {userData.region}
           </Text>
 
-          {/* Botões de ações padrão */}
           <CustomButton
             title="Editar Perfil"
             onPress={() => navigation.navigate("TelaEditarPerfil")}
@@ -105,14 +99,11 @@ const TelaPerfil = ({ navigation }) => {
         </View>
       )}
 
-      {/* Divisória entre os botões e a seção de serviços */}
       <View style={styles.divider} />
 
       <Text style={styles.sectionTitle}>Últimos serviços consumidos</Text>
 
-      {/* Scroll para os serviços */}
       <ScrollView horizontal={true} style={styles.servicesScroll}>
-        {/* Card 1 */}
         <View style={styles.serviceCard}>
           <Image
             source={{
@@ -123,7 +114,6 @@ const TelaPerfil = ({ navigation }) => {
           <Text style={styles.serviceDescription}>Design Gráfico</Text>
         </View>
 
-        {/* Card 2 */}
         <View style={styles.serviceCard}>
           <Image
             source={{
@@ -134,7 +124,6 @@ const TelaPerfil = ({ navigation }) => {
           <Text style={styles.serviceDescription}>Desenvolvimento de Website</Text>
         </View>
 
-        {/* Card 3 */}
         <View style={styles.serviceCard}>
           <Image
             source={{
@@ -160,7 +149,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   coverImageContainer: {
-    backgroundColor: "#f0f0f0", 
+    backgroundColor: "#f0f0f0",
     width: "200%",
     height: 300,
     borderRadius: 10,
@@ -173,7 +162,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   profileImageContainer: {
-    backgroundColor: "#f0f0f0", 
+    backgroundColor: "#f0f0f0",
     width: 150,
     height: 150,
     borderRadius: 65,
