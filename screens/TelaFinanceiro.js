@@ -126,7 +126,7 @@ const TelaFinanceiro = () => {
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: "pagos", title: "Pagos" },
-    { key: "pendentes", title: "Pendências" },
+    { key: "pendentes", title: "Pendentes" },
   ]);
 
   const renderScene = SceneMap({
@@ -136,7 +136,7 @@ const TelaFinanceiro = () => {
 
   return (
     <View style={styles.container}>
-      {}
+      { }
       <View style={styles.searchBar}>
         <TextInput
           style={styles.searchInput}
@@ -144,7 +144,7 @@ const TelaFinanceiro = () => {
         />
       </View>
 
-      {}
+      { }
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
@@ -153,10 +153,13 @@ const TelaFinanceiro = () => {
         renderTabBar={(props) => (
           <TabBar
             {...props}
-            indicatorStyle={styles.tabIndicator}
-            style={styles.tabBar}
-            labelStyle={styles.tabLabel}
+            indicatorStyle={styles.tabIndicator} 
+            style={styles.tabBar} 
+            labelStyle={styles.tabLabel} 
+            activeColor="#007AFF" 
+            inactiveColor="#000000" 
           />
+
         )}
       />
     </View>
@@ -167,13 +170,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F7FA",
-    paddingTop: 16, 
+    paddingTop: 16,
   },
   searchBar: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     backgroundColor: "#E5E9F2",
-    marginTop: 16, 
+    marginTop: 16,
   },
   searchInput: {
     backgroundColor: "#FFF",
@@ -230,14 +233,15 @@ const styles = StyleSheet.create({
     color: "red",
   },
   tabBar: {
-    backgroundColor: "#E5E9F2",
+    backgroundColor: "#E5E9F2", 
   },
   tabIndicator: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#007AFF", 
+    height: 3, 
   },
   tabLabel: {
-    color: "#333",
-    fontWeight: "bold",
+    fontWeight: "bold", 
+    fontSize: 14, 
   },
 });
 
