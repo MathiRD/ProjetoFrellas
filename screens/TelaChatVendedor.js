@@ -30,7 +30,7 @@ const TelaChatVendedor = () => {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
-      {/* Cabeçalho */}
+      {}
       <View style={styles.header}>
         <TouchableOpacity>
           <Text style={styles.voltar}>&larr;</Text>
@@ -38,7 +38,7 @@ const TelaChatVendedor = () => {
         <Text style={styles.nomeProfissional}>João da Silva</Text>
       </View>
 
-      {/* Lista de mensagens */}
+      {}
       <FlatList
         data={mensagens}
         keyExtractor={(item) => item.id}
@@ -46,7 +46,7 @@ const TelaChatVendedor = () => {
         contentContainerStyle={styles.listaMensagens}
       />
 
-      {/* Campo de input */}
+      {}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -66,13 +66,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop: 40, 
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 20, 
     borderBottomWidth: 1,
     borderColor: '#ddd',
+    marginBottom: 16, 
   },
   voltar: {
     fontSize: 18,
@@ -112,6 +115,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderTopWidth: 1,
     borderColor: '#ddd',
+    marginBottom: 20, 
   },
   input: {
     flex: 1,
@@ -132,7 +136,10 @@ const styles = StyleSheet.create({
   },
   botaoEnviarTexto: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 30,
+    textAlign: 'center', 
+    textAlignVertical: 'center', 
+    marginTop: -5,
   },
 });
 
