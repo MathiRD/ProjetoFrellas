@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { launchImageLibrary } from "react-native-image-picker";
 import {
   View,
   Text,
@@ -6,16 +7,30 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Modal,
+  TextInput,
+  Button,
 } from "react-native";
-import ImagePicker from "react-native-image-picker";
 import CustomButton from "../src/components/CustomButton";
+import Supabase from "../src/SupabaseClient";
 
 const TelaPerfil = ({ navigation }) => {
+  const [userData, setUserData] = useState(null);
+  const [services, setServices] = useState([]);
+  const [profileImage, setProfileImage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+
+  const defaultImageUrl = "https://cdn.pixabay.com/photo/2024/06/01/14/00/ai-8802304_1280.jpg";
+
+  // Mocked User Data
   const mockUserData = {
     name: "Usuário Teste",
     country: "Brasil",
     region: "RS",
-    profileImageUrl: "https://example.com/default-profile.png",
+    profileImageUrl: defaultImageUrl,
     coverImageUrl: "https://example.com/default-cover.png",
   };
 
@@ -37,29 +52,87 @@ const TelaPerfil = ({ navigation }) => {
     },
   ];
 
-  const [userData] = useState(mockUserData);
-  const [services] = useState(mockServices);
-  const [profileImage, setProfileImage] = useState(userData.profileImageUrl);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data: session, error: sessionError } = await Supabase.auth.getSession();
 
-  const chooseImage = () => {
-    const options = {
-      title: "Selecionar Imagem",
-      storageOptions: {
-        skipBackup: true,
-        path: "images",
-      },
+        if (sessionError) {
+          setError("Erro ao obter sessão");
+          return;
+        }
+
+        const user = session?.session?.user;
+
+        if (user) {
+          const userId = user.id;
+
+          const { data, error } = await Supabase
+            .from("profiles")
+            .select("id, username, full_name, avatar_url, website")
+            .eq("id", userId)
+            .single();
+
+          if (error) {
+            setError(error.message);
+          } else {
+            setUserData(data);
+            setProfileImage(data.avatar_url || defaultImageUrl);
+          }
+        } else {
+          setError("Sessão ou usuário não encontrados.");
+        }
+      } catch (err) {
+        setError("Erro ao carregar os dados do usuário.");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    ImagePicker.showImagePicker(options, (response) => {
-      if (response.didCancel) {
-        console.log("Usuário cancelou a seleção de imagem");
-      } else if (response.error) {
-        console.log("Erro:", response.error);
+    fetchUserData();
+  }, []);
+
+  const saveImageUrl = async (url) => {
+    try {
+      const { data, error } = await Supabase
+        .from("profiles")
+        .update({ avatar_url: url })
+        .eq("id", userData.id);
+
+      if (error) {
+        console.log("Erro ao atualizar a imagem de perfil:", error.message);
+        setError("Erro ao atualizar imagem de perfil.");
       } else {
-        setProfileImage(response.uri);
+        console.log("Imagem de perfil atualizada com sucesso!");
       }
-    });
+    } catch (err) {
+      console.log("Erro ao salvar a URL da imagem:", err);
+      setError("Erro ao salvar a URL da imagem.");
+    }
   };
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleLinkSubmit = () => {
+    if (imageUrl) {
+      setProfileImage(imageUrl);
+      saveImageUrl(imageUrl); // Salva a URL do link no banco de dados
+      setModalVisible(false);
+      setImageUrl(""); // Limpa o campo
+    } else {
+      console.log("Link inválido");
+    }
+  };
+
+  if (loading) {
+    return <Text>Carregando...</Text>;
+  }
+
+  if (error) {
+    return <Text>{`Erro: ${error}`}</Text>;
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -72,20 +145,20 @@ const TelaPerfil = ({ navigation }) => {
             />
           </View>
 
-          <TouchableOpacity onPress={chooseImage}>
+          <TouchableOpacity onPress={openModal}>
             <View style={styles.profileImageContainer}>
               <Image
                 source={{
-                  uri: profileImage || "https://example.com/default-profile.png",
+                  uri: profileImage || defaultImageUrl,
                 }}
                 style={styles.profileImage}
               />
             </View>
           </TouchableOpacity>
 
-          <Text style={styles.userName}>{userData.name}</Text>
+          <Text style={styles.userName}>{userData.username}</Text>
           <Text style={styles.location}>
-            {userData.country}, {userData.region}
+            {userData.country || "Brasil"}, {userData.region || "RS"}
           </Text>
 
           <CustomButton
@@ -104,36 +177,36 @@ const TelaPerfil = ({ navigation }) => {
       <Text style={styles.sectionTitle}>Últimos serviços consumidos</Text>
 
       <ScrollView horizontal={true} style={styles.servicesScroll}>
-        <View style={styles.serviceCard}>
-          <Image
-            source={{
-              uri: "https://weremote.net/wp-content/uploads/2022/07/paletas-colores-ordenador-escritorio.jpg",
-            }}
-            style={styles.serviceImage}
-          />
-          <Text style={styles.serviceDescription}>Design Gráfico</Text>
-        </View>
-
-        <View style={styles.serviceCard}>
-          <Image
-            source={{
-              uri: "https://th.bing.com/th/id/OIP.w49nn7CK_MYj1a7Y3wKB-AHaEK?rs=1&pid=ImgDetMain",
-            }}
-            style={styles.serviceImage}
-          />
-          <Text style={styles.serviceDescription}>Desenvolvimento de Website</Text>
-        </View>
-
-        <View style={styles.serviceCard}>
-          <Image
-            source={{
-              uri: "https://opportunitymarketing.co.uk/wp-content/uploads/2020/12/Marketing_Campaign-graphic-scaled.jpg",
-            }}
-            style={styles.serviceImage}
-          />
-          <Text style={styles.serviceDescription}>Consultoria em Marketing</Text>
-        </View>
+        {mockServices.map((service) => (
+          <View key={service.id} style={styles.serviceCard}>
+            <Image
+              source={{ uri: service.imageUrl }}
+              style={styles.serviceImage}
+            />
+            <Text style={styles.serviceDescription}>{service.description}</Text>
+          </View>
+        ))}
       </ScrollView>
+
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text>Insira o link da imagem</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Cole o link da imagem"
+              value={imageUrl}
+              onChangeText={setImageUrl}
+            />
+            <Button title="Confirmar" onPress={handleLinkSubmit} />
+            <Button title="Cancelar" onPress={() => setModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -223,11 +296,25 @@ const styles = StyleSheet.create({
     color: "#333",
     textAlign: "center",
   },
-  noServicesText: {
-    fontSize: 16,
-    color: "#999",
-    textAlign: "center",
-    marginTop: 20,
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  input: {
+    width: '100%',
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 10,
   },
 });
 

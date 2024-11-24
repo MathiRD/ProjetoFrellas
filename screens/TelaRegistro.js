@@ -46,9 +46,17 @@ function TelaRegistro({ navigation }) {
       return;
     }
 
+    const username = email.split('@')[0];
+
     const { user, error } = await Supabase.auth.signUp({
       email,
       password: senha,
+      options: {
+        data: {
+          username: username,
+          full_name: nome,
+        },
+      },
     });
 
     if (error) {

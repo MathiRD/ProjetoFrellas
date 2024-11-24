@@ -35,6 +35,12 @@ function TelaLogin({ navigation }) {
     } else {
       Alert.alert('Sucesso', 'Login realizado com sucesso!');
       navigation.navigate('Home');
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        }),
+      )
     }
   };
 
