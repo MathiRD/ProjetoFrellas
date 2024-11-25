@@ -8,7 +8,7 @@ const pagamentosIniciais = {
     {
       id: "1",
       titulo: "Pintura de uma parede",
-      valor: "150",
+      valor: "169",
       data: "05/10/2024",
       status: "Pago",
       profissional: "Pintor - João",
@@ -33,21 +33,30 @@ const pagamentosIniciais = {
   pendentes: [
     {
       id: "1",
-      titulo: "Pintura de uma parede",
-      valor: "200",
-      data: "12/10/2024",
+      titulo: "Cortar a grama",
+      valor: "50",
+      data: "02/12/2024",
       status: "Pendente",
-      profissional: "Pintor - João",
+      profissional: "Jardineiro - Paulo",
     },
     {
       id: "2",
-      titulo: "Instalação do lustre na sala",
-      valor: "200",
-      data: "12/10/2024",
+      titulo: "Limpeza completo no apto",
+      valor: "469",
+      data: "04/12/2024",
       status: "Pendente",
-      profissional: "Eletricista - Fábio",
+      profissional: "Doméstica - Jaqueline",
+    },
+    {
+      id: "3",
+      titulo: "Formatar 3 computadores",
+      valor: "250",
+      data: "30/11/2024",
+      status: "Pendente",
+      profissional: "Técnico TI - Rômulo",
     },
   ],
+  
 };
 
 const CardPagamento = ({ titulo, valor, data, status, profissional }) => (
