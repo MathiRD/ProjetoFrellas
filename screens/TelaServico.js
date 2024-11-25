@@ -1,53 +1,81 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   Image,
-  TextInput,
   TouchableOpacity,
 } from "react-native";
 
 function TelaServico({ route, navigation }) {
   const { service } = route.params;
-  const [contactMessage, setContactMessage] = useState("");
-
-  const handleContact = () => {
-    alert(`Mensagem enviada: ${contactMessage}`);
-    setContactMessage(""); // Limpar campo de mensagem
-  };
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        {/* Cabeçalho com imagem */}
+      <ScrollView>
+        {/* Header com imagem e detalhes principais */}
         <View style={styles.headerContainer}>
-          <Image
-            source={{ uri: service.imageSource }}
-            style={styles.headerImage}
-          />
+          <Image source={{ uri: service.imageSource }} style={styles.headerImage} />
+          <View style={styles.overlay}>
+            <Text style={styles.headerTitle}>{service.title}</Text>
+            <Text style={styles.headerLocation}>{service.location}</Text>
+            <View style={styles.headerStats}>
+              <Text style={styles.stat}>⭐ +100 Serviços feitos</Text>
+              <Text style={styles.stat}>⭐ {service.experience} Anos no mercado</Text>
+            </View>
+          </View>
         </View>
 
-        {/* Detalhes do Serviço */}
+        {/* Descrição */}
         <View style={styles.detailsContainer}>
-          <Text style={styles.title}>{service.title}</Text>
-          <Text style={styles.status}>{service.status}</Text>
+          <Text style={styles.sectionTitle}>Descrição</Text>
           <Text style={styles.description}>{service.description}</Text>
         </View>
 
-        {/* Seção de contato */}
-        <View style={styles.contactContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Deixe sua mensagem"
-            value={contactMessage}
-            onChangeText={setContactMessage}
-            multiline
-            numberOfLines={4}
-          />
-          <TouchableOpacity style={styles.button} onPress={handleContact}>
-            <Text style={styles.buttonText}>Enviar Mensagem</Text>
+        {/* Informações do profissional */}
+        <View style={styles.profileContainer}>
+          <Image source={{ uri: service.profileImage }} style={styles.profileImage} />
+          <View style={styles.profileDetails}>
+            <Text style={styles.profileName}>{service.professionalName}</Text>
+            <Text style={styles.profileRole}>{service.professionalRole}</Text>
+          </View>
+          <View style={styles.contactIcons}>
+            <TouchableOpacity style={styles.iconButton}>
+              <Text>📞</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton}>
+              <Text>💬</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Galeria */}
+        <View style={styles.galleryContainer}>
+          <Text style={styles.sectionTitle}>Galeria</Text>
+          {service.gallery && Array.isArray(service.gallery) && service.gallery.length > 0 ? (
+            <ScrollView horizontal>
+              {service.gallery.map((image, index) => (
+                <Image key={index} source={{ uri: image }} style={styles.galleryImage} />
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={styles.noGalleryText}>Nenhuma imagem disponível</Text>
+          )}
+        </View>
+
+        {/* Placeholder do mapa */}
+        <View style={styles.mapPlaceholder}>
+          <Text style={styles.mapPlaceholderText}>Mapa será integrado aqui</Text>
+        </View>
+
+        {/* Preço e botão */}
+        <View style={styles.footerContainer}>
+          <Text style={styles.price}>
+            Preço estimado: <Text style={styles.priceValue}>R$: {service.priceRange}</Text>
+          </Text>
+          <TouchableOpacity style={styles.actionButton}>
+            <Text style={styles.actionButtonText}>Contratar agora</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -60,71 +88,129 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFF",
   },
-  scrollView: {
-    flex: 1,
-  },
-  // Cabeçalho com a imagem do serviço
   headerContainer: {
+    position: "relative",
     height: 250,
-    backgroundColor: "#F4F4F4",
-    justifyContent: "center",
-    alignItems: "center",
   },
   headerImage: {
     width: "100%",
     height: "100%",
-    borderRadius: 10,
-    resizeMode: "cover",
   },
-  // Detalhes do serviço
+  overlay: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#FFF",
+  },
+  headerLocation: {
+    fontSize: 16,
+    color: "#FFF",
+    marginTop: 5,
+  },
+  headerStats: {
+    marginTop: 10,
+  },
+  stat: {
+    fontSize: 14,
+    color: "#FFF",
+  },
   detailsContainer: {
     padding: 20,
-    backgroundColor: "#FFF",
   },
-  title: {
-    fontSize: 26, // Tamanho maior para título
-    fontWeight: "bold",
-    color: "#333", // Cor escura
-    marginBottom: 10,
-  },
-  status: {
+  sectionTitle: {
     fontSize: 18,
-    color: "#28a745", // Cor verde para status "Aberto"
+    fontWeight: "bold",
     marginBottom: 10,
   },
   description: {
     fontSize: 16,
-    color: "#555", // Cor mais suave para a descrição
-    lineHeight: 22,
-    marginBottom: 20,
+    color: "#555",
   },
-  // Contato: Caixa de mensagem e botão
-  contactContainer: {
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     padding: 20,
-    backgroundColor: "#F9F9F9",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
   },
-  input: {
-    height: 120,
-    borderColor: "#ddd",
-    borderWidth: 1,
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  profileDetails: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  profileName: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  profileRole: {
+    fontSize: 14,
+    color: "#777",
+  },
+  contactIcons: {
+    flexDirection: "row",
+  },
+  iconButton: {
+    marginLeft: 10,
+    padding: 10,
     borderRadius: 10,
-    paddingLeft: 10,
-    paddingTop: 10,
-    textAlignVertical: "top",
+    backgroundColor: "#E8F0FE",
+  },
+  galleryContainer: {
+    padding: 20,
+  },
+  galleryImage: {
+    width: 100,
+    height: 100,
+    marginRight: 10,
+    borderRadius: 10,
+  },
+  noGalleryText: {
     fontSize: 16,
-    color: "#333",
-    marginBottom: 20,
+    color: "#888",
+    textAlign: "center",
+    marginTop: 10,
   },
-  button: {
-    backgroundColor: "#1e90ff", // Cor azul do botão
-    paddingVertical: 15,
+  mapPlaceholder: {
+    height: 200,
+    backgroundColor: "#F0F0F0",
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 20,
+    marginVertical: 10,
     borderRadius: 10,
+  },
+  mapPlaceholderText: {
+    fontSize: 16,
+    color: "#888",
+  },
+  footerContainer: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderColor: "#EEE",
     alignItems: "center",
   },
-  buttonText: {
-    fontSize: 18, // Tamanho de fonte maior
+  price: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  priceValue: {
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  actionButton: {
+    backgroundColor: "#1e90ff",
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+  },
+  actionButtonText: {
+    fontSize: 18,
     color: "#FFF",
     fontWeight: "bold",
   },
