@@ -14,12 +14,10 @@ function TelaServico({ route, navigation }) {
   return (
     <View style={styles.container}>
       <ScrollView>
-        {}
+        {/* Header com imagem de fundo */}
         <View style={styles.headerContainer}>
           <Image source={{ uri: service.imageSource }} style={styles.headerImage} />
-          {}
           <View style={styles.headerOverlay} />
-          {}
           <View style={styles.overlayContent}>
             <Text style={styles.headerTitle}>{service.title}</Text>
             <View style={styles.locationContainer}>
@@ -33,13 +31,13 @@ function TelaServico({ route, navigation }) {
           </View>
         </View>
 
-        {}
+        {/* Descrição */}
         <View style={styles.detailsContainer}>
           <Text style={styles.sectionTitle}>Descrição</Text>
           <Text style={styles.description}>{service.description}</Text>
         </View>
 
-        {}
+        {/* Perfil */}
         <View style={styles.profileContainer}>
           <Image source={{ uri: service.profileImage }} style={styles.profileImage} />
           <View style={styles.profileDetails}>
@@ -56,26 +54,24 @@ function TelaServico({ route, navigation }) {
           </View>
         </View>
 
-        {}
+        {/* Galeria substituída */}
         <View style={styles.galleryContainer}>
           <Text style={styles.sectionTitle}>Galeria</Text>
-          {service.gallery && Array.isArray(service.gallery) && service.gallery.length > 0 ? (
-            <ScrollView horizontal>
-              {service.gallery.map((image, index) => (
-                <Image key={index} source={{ uri: image }} style={styles.galleryImage} />
-              ))}
-            </ScrollView>
-          ) : (
-            <Text style={styles.noGalleryText}>Nenhuma imagem disponível</Text>
-          )}
+          <ScrollView horizontal>
+            {[...Array(5)].map((_, index) => (
+              <View key={index} style={styles.galleryPlaceholder}>
+                <Text style={styles.galleryPlaceholderText}>Imagem {index + 1}</Text>
+              </View>
+            ))}
+          </ScrollView>
         </View>
 
-        {}
+        {/* Mapa */}
         <View style={styles.mapPlaceholder}>
           <Text style={styles.mapPlaceholderText}>Mapa será integrado aqui</Text>
         </View>
 
-        {}
+        {/* Footer */}
         <View style={styles.footerContainer}>
           <Text style={styles.price}>
             Preço estimado: <Text style={styles.priceValue}>R$: {service.priceRange}</Text>
@@ -103,8 +99,8 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   headerOverlay: {
-    ...StyleSheet.absoluteFillObject, 
-    backgroundColor: "rgba(0, 0, 0, 0.5)", 
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   overlayContent: {
     position: "absolute",
@@ -115,22 +111,21 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#FFF",
-    marginLeft: 7, 
+    marginLeft: 7,
   },
-  
   locationContainer: {
-    flexDirection: "row", 
+    flexDirection: "row",
     alignItems: "center",
-    marginTop: 5, 
+    marginTop: 5,
   },
   locationIcon: {
-    fontSize: 12, 
-    marginRight: 2, 
+    fontSize: 12,
+    marginRight: 2,
   },
   locationText: {
-    fontSize: 14, 
-    color: "#FFF", 
-  },  
+    fontSize: 14,
+    color: "#FFF",
+  },
   headerStats: {
     marginTop: 10,
   },
@@ -184,17 +179,18 @@ const styles = StyleSheet.create({
   galleryContainer: {
     padding: 20,
   },
-  galleryImage: {
+  galleryPlaceholder: {
     width: 100,
     height: 100,
     marginRight: 10,
+    backgroundColor: "#E8E8E8",
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 10,
   },
-  noGalleryText: {
-    fontSize: 16,
+  galleryPlaceholderText: {
+    fontSize: 14,
     color: "#888",
-    textAlign: "center",
-    marginTop: 10,
   },
   mapPlaceholder: {
     height: 200,
