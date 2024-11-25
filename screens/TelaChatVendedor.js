@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 
 const TelaChatVendedor = () => {
+  const route = useRoute();
+  const { servico } = route.params || {}; // Garante que route.params sempre exista
+
   const [mensagens, setMensagens] = useState([
-    { id: '1', texto: 'Olá, tudo bem?', enviadoPorUsuario: true },
-    { id: '2', texto: 'Tudo e com você?', enviadoPorUsuario: false },
+    { id: '1', texto: `Olá, estou interessado em ${servico?.categoria || 'seu serviço'}.`, enviadoPorUsuario: true },
+    { id: '2', texto: 'Ótimo! Como posso ajudar?', enviadoPorUsuario: false },
   ]);
+
   const [novaMensagem, setNovaMensagem] = useState('');
 
   const enviarMensagem = () => {
@@ -30,15 +35,15 @@ const TelaChatVendedor = () => {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
-      {}
+      {/* Cabeçalho */}
       <View style={styles.header}>
         <TouchableOpacity>
           <Text style={styles.voltar}>&larr;</Text>
         </TouchableOpacity>
-        <Text style={styles.nomeProfissional}>João da Silva</Text>
+        <Text style={styles.nomeProfissional}>{servico?.categoria || 'Serviço'}</Text>
       </View>
 
-      {}
+      {/* Lista de mensagens */}
       <FlatList
         data={mensagens}
         keyExtractor={(item) => item.id}
@@ -46,7 +51,7 @@ const TelaChatVendedor = () => {
         contentContainerStyle={styles.listaMensagens}
       />
 
-      {}
+      {/* Campo de entrada de texto */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -66,16 +71,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 40, 
+    paddingTop: 40,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 20, 
+    paddingVertical: 20,
     borderBottomWidth: 1,
     borderColor: '#ddd',
-    marginBottom: 16, 
+    marginBottom: 16,
   },
   voltar: {
     fontSize: 18,
@@ -106,8 +111,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#e1e1e1',
   },
   textoMensagem: {
-    color: '#fff',
     fontSize: 16,
+    color: '#fff',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -115,7 +120,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderTopWidth: 1,
     borderColor: '#ddd',
-    marginBottom: 20, 
+    marginBottom: 20,
   },
   input: {
     flex: 1,
@@ -137,8 +142,8 @@ const styles = StyleSheet.create({
   botaoEnviarTexto: {
     color: '#fff',
     fontSize: 30,
-    textAlign: 'center', 
-    textAlignVertical: 'center', 
+    textAlign: 'center',
+    textAlignVertical: 'center',
     marginTop: -5,
   },
 });

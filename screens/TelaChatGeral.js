@@ -28,12 +28,15 @@ const TelaChatGeral = ( { navigation }) => {
       <Text style={styles.categoria}>{item.categoria}</Text>
       <Text style={styles.detalhes}>{item.detalhes}</Text>
       <Text style={styles.prazo}>{item.prazo}</Text>
-      <TouchableOpacity style={styles.botao} onPress={() => navigation.navigate("TelaChatVendedor")}>
+      <TouchableOpacity
+        style={styles.botao}
+        onPress={() => navigation.navigate("TelaChatVendedor", { servico: item })}
+      >
         <Text style={styles.botaoTexto}>Falar com vendedor</Text>
       </TouchableOpacity>
     </View>
   );
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
