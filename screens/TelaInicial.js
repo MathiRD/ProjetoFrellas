@@ -272,41 +272,41 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     height: 300,
-    backgroundColor: "#f4f4f4", // Alterei para um cinza mais claro
+    backgroundColor: "#f4f4f4",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10, // Adicionei um borderRadius para suavizar os cantos
-    shadowColor: "#000", // Cor da sombra
-    shadowOffset: { width: 0, height: 5 }, // Aumentei o deslocamento da sombra
-    shadowOpacity: 0.2, // Aumentei a opacidade para uma sombra mais forte
-    shadowRadius: 10, // Aumentei o raio para uma sombra mais difusa
-    elevation: 10, // Para sombra no Android
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 10,
   },
   map: {
     width: "100%",
     height: "100%",
-    borderRadius: 10, // Manter os cantos arredondados
+    borderRadius: 10,
   },
   sectionTitle: {
     fontSize: 22,
     fontWeight: "bold",
     marginVertical: 10,
     paddingHorizontal: 10,
-    color: "#333", // Cor do texto para contraste
+    color: "#333",
   },
   servicesContainer: {
     flexDirection: "row",
     paddingHorizontal: 10,
   },
   card: {
-    backgroundColor: "#fff", // Fundo branco para destacar os cards
+    backgroundColor: "#fff",
     borderRadius: 15,
     margin: 5,
     width: 150,
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
-    shadowColor: "#000", // Adicionando sombra nos cards
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     marginTop: 5,
-    color: "#007bff", // Cor de destaque para o título
+    color: "#007bff",
   },
   cardStatus: {
     fontSize: 12,
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     height: 40,
-    borderColor: "#ccc", // Cor de borda mais visível
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5,
     paddingLeft: 10,
@@ -343,16 +343,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   categoryItem: {
-    backgroundColor: "#fff", // Antes estava #f0f0f0 (branco padrão)
+    backgroundColor: "#fff",
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 15,
     marginRight: 10,
-    borderWidth: 1, // Adicionando uma borda para tornar mais visível o estado selecionado
-    borderColor: "#8c8c8c", // Cor de borda leve
+    borderWidth: 1,
+    borderColor: "#8c8c8c",
   },
   selectedCategory: {
-    backgroundColor: "#f0f0f0", // Mudando para cinza claro quando selecionado
+    backgroundColor: "#f0f0f0",
   },
   categoryText: {
     fontSize: 16,
@@ -380,9 +380,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 15,
     padding: 10,
-    backgroundColor: "#fff", // Fundo branco para destaque
-    borderRadius: 15, // Tornando os cantos mais suaves
-    shadowColor: "#000", // Sombra visível
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 20,
     right: 20,
-    backgroundColor: "#007bff", // Cor de destaque
+    backgroundColor: "#007bff",
     padding: 10,
     borderRadius: 5,
     zIndex: 10,

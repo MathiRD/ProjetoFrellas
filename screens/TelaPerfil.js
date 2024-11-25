@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
 import CustomButton from "../src/components/CustomButton";
 import Supabase from "../src/SupabaseClient";
 
@@ -16,8 +10,10 @@ const TelaPerfil = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const defaultImageUrl = "https://cdn.pixabay.com/photo/2024/06/01/14/00/ai-8802304_1280.jpg";
-  const defaultBannerUrl = "https://next-images.123rf.com/index/_next/image/?url=https://assets-cdn.123rf.com/index/static/assets/top-section-bg.jpeg&w=3840&q=75";
+  const defaultImageUrl =
+    "https://cdn.pixabay.com/photo/2024/06/01/14/00/ai-8802304_1280.jpg";
+  const defaultBannerUrl =
+    "https://next-images.123rf.com/index/_next/image/?url=https://assets-cdn.123rf.com/index/static/assets/top-section-bg.jpeg&w=3840&q=75";
 
   const mockServices = [
     {
@@ -40,7 +36,8 @@ const TelaPerfil = ({ navigation }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const { data: session, error: sessionError } = await Supabase.auth.getSession();
+        const { data: session, error: sessionError } =
+          await Supabase.auth.getSession();
 
         if (sessionError) {
           setError("Erro ao obter sessão");
@@ -52,9 +49,10 @@ const TelaPerfil = ({ navigation }) => {
         if (user) {
           const userId = user.id;
 
-          const { data, error } = await Supabase
-            .from("profiles")
-            .select("id, username, full_name, avatar_url, banner_url, country, city, uf")
+          const { data, error } = await Supabase.from("profiles")
+            .select(
+              "id, username, full_name, avatar_url, banner_url, country, city, uf"
+            )
             .eq("id", userId)
             .single();
 
@@ -90,15 +88,10 @@ const TelaPerfil = ({ navigation }) => {
     <ScrollView style={styles.container}>
       {userData && (
         <View style={styles.profileContainer}>
-          {/* Banner do Usuário */}
           <View style={styles.coverImageContainer}>
-            <Image
-              source={{ uri: bannerImage }}
-              style={styles.coverImage}
-            />
+            <Image source={{ uri: bannerImage }} style={styles.coverImage} />
           </View>
 
-          {/* Foto de Perfil */}
           <View style={styles.profileImageContainer}>
             <Image
               source={{
@@ -175,7 +168,7 @@ const styles = StyleSheet.create({
     borderColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: -70, // Para sobrepor a imagem de banner
+    marginTop: -70,
   },
   profileImage: {
     width: 140,
@@ -206,6 +199,7 @@ const styles = StyleSheet.create({
   },
   servicesScroll: {
     marginBottom: 20,
+    paddingBottom: 20,
   },
   serviceCard: {
     backgroundColor: "#f5f5f5",
@@ -215,6 +209,16 @@ const styles = StyleSheet.create({
     width: 180,
     alignItems: "center",
     justifyContent: "center",
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+
+    elevation: 5,
   },
   serviceImage: {
     width: 100,
@@ -226,7 +230,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     textAlign: "center",
-  }
+  },
 });
 
 export default TelaPerfil;

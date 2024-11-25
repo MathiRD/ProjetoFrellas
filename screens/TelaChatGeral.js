@@ -107,6 +107,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 16,
     marginBottom: 16,
+    // Adicionando o efeito de box-shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5, // Necessário para Android
   },
   categoria: {
     fontSize: 18,
