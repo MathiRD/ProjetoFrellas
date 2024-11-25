@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { 
-  View, 
-  TextInput, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
-  Image, 
-  Modal, 
-  Button, 
-  KeyboardAvoidingView, 
-  Platform 
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Modal,
+  Button,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator
 } from "react-native";
 import CustomButton from "../src/components/CustomButton";
 import Supabase from "../src/SupabaseClient";
@@ -20,7 +21,8 @@ const TelaEditarPerfil = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [bannerImage, setBannerImage] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [error, setError] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
@@ -123,6 +125,10 @@ const TelaEditarPerfil = ({ navigation }) => {
   };
 
   const saveChanges = async () => {
+    setLoading(true);
+    setError(null);
+    setSuccessMessage(""); 
+
     try {
       const { data, error } = await Supabase
         .from("profiles")
@@ -131,6 +137,8 @@ const TelaEditarPerfil = ({ navigation }) => {
 
       if (error) {
         setError(`Erro ao atualizar perfil: ${error.message}`);
+      } else {
+        setSuccessMessage("Perfil atualizado com sucesso!");
       }
 
       if (newEmail && newEmail !== email) {
@@ -154,15 +162,26 @@ const TelaEditarPerfil = ({ navigation }) => {
       }
     } catch (err) {
       setError("Erro ao salvar alterações.");
+    } finally {
+      setLoading(false);
     }
   };
 
   if (loading) {
-    return <Text>Carregando...</Text>;
+    return (
+      <View style={styles.centeredContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Salvando...</Text>
+      </View>
+    );
   }
 
   if (error) {
-    return <Text>{error}</Text>;
+    return (
+      <View style={styles.centeredContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
   }
 
   return (
@@ -171,8 +190,6 @@ const TelaEditarPerfil = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Editar Perfil</Text>
-
         <TouchableOpacity onPress={() => openModal(true)} style={styles.bannerContainer}>
           <Image source={{ uri: bannerImage || defaultBannerUrl }} style={styles.bannerImage} />
         </TouchableOpacity>
@@ -222,6 +239,12 @@ const TelaEditarPerfil = ({ navigation }) => {
         <View style={styles.buttonContainer}>
           <CustomButton title="Salvar" onPress={saveChanges} />
         </View>
+
+        {successMessage && (
+          <View style={styles.successContainer}>
+            <Text style={styles.successMessage}>{successMessage}</Text>
+          </View>
+        )}
 
         <Modal transparent visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalContainer}>
@@ -312,6 +335,27 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
   },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  successContainer: {
+    padding: 10,
+    backgroundColor: "green",
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  successMessage: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    fontSize: 16,
+  }
 });
 
 export default TelaEditarPerfil;

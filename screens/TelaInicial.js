@@ -1,18 +1,12 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, Modal } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 
 function TelaInicial({ navigation }) {
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Dados dos serviços
   const mockCards = [
     {
       id: "1",
@@ -22,6 +16,7 @@ function TelaInicial({ navigation }) {
         "Manutenção básica, troca de óleo, troca de pastilhas de freio, filtro de oleo, e manutenções em geral",
       imageSource:
         "https://cocupo.com/wp-content/uploads/2016/05/que-es-un-mecanico.jpg",
+      category: "Manutenção"
     },
     {
       id: "2",
@@ -31,6 +26,7 @@ function TelaInicial({ navigation }) {
         "Serviço diarista para auxiliador de instalação elétrica residencial.",
       imageSource:
         "https://inpolpolimeros.com.br/wp-content/uploads/2023/04/contratar-eletricista-scaled.jpg",
+      category: "Dia a Dia"
     },
     {
       id: "3",
@@ -40,6 +36,7 @@ function TelaInicial({ navigation }) {
         "Serviço diarista para auxílio em instalação doméstica de banheiros no ED Vivenda",
       imageSource:
         "https://th.bing.com/th/id/R.6b7ce0e8a5dcf64078ca7db0c4f97e77?rik=vk6odBs898iVUQ&pid=ImgRaw&r=0",
+      category: "Dia a Dia"
     },
     {
       id: "4",
@@ -49,6 +46,7 @@ function TelaInicial({ navigation }) {
         "Prestação de suporte a formatação de computadores empresariais.",
       imageSource:
         "https://th.bing.com/th/id/OIP.x7wjoKkNsXxnwlM8JX5BhgHaE8?rs=1&pid=ImgDetMain",
+      category: "Informatica"
     },
   ];
 
@@ -60,6 +58,7 @@ function TelaInicial({ navigation }) {
         "Pintura de paredes internas e externas. Serviço altamente recomendado pelos clientes.",
       imageSource:
         "https://guia.ar/wp-content/uploads/2021/02/servise-image-5.jpg",
+      category: "Dia a Dia"
     },
     {
       id: "2",
@@ -68,6 +67,7 @@ function TelaInicial({ navigation }) {
         "Diarista com montagens de móveis planejados. Com ótima reputação e atendendo diversas demandas.",
       imageSource:
         "https://www.lhmontagemdemoveis.com.br/wp-content/uploads/2019/11/Montador-De-M%C3%B3veis-EM-Salvador-BA.png",
+      category: "Mão de obra"
     },
     {
       id: "3",
@@ -76,6 +76,7 @@ function TelaInicial({ navigation }) {
         "Diarista Doméstica. Empresa especializada há mais de 10 anos.",
       imageSource:
         "https://vejasp.abril.com.br/wp-content/uploads/2016/12/domestica_-divulgacao-desvia-3-1.jpeg?quality=70&strip=info&w=928",
+      category: "Dia a Dia"
     },
     {
       id: "4",
@@ -84,13 +85,28 @@ function TelaInicial({ navigation }) {
         "Manutenção de jardins, poda de árvores e plantas. Empresa destaque no ramo.",
       imageSource:
         "https://img.freepik.com/free-photo/smiling-afro-gardener-using-hedge-trimmer-cutting-bushes_651396-1479.jpg",
+      category: "Jardinagem"
     },
   ];
 
-  // Filtra os serviços populares de acordo com o texto da busca
+  const categories = ["Dia a Dia", "Informatica", "Mão de obra", "Jardinagem", "Manutenção"];
+
   const filteredPopulares = mockPopulares.filter((popular) =>
-    popular.title.toLowerCase().includes(searchText.toLowerCase())
+    (popular.title.toLowerCase().includes(searchText.toLowerCase()) || !searchText) &&
+    (popular.category === selectedCategory || !selectedCategory)
   );
+
+  const openMapModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const closeMapModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCategorySelect = (category) => {
+    setSelectedCategory((prevCategory) => (prevCategory === category ? null : category));
+  };
 
   return (
     <View style={styles.container}>
@@ -98,12 +114,24 @@ function TelaInicial({ navigation }) {
         style={styles.mainScroll}
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        {/* Map Container */}
-        <View style={styles.mapContainer}>
-          <Text style={styles.mapText}>Mapa - Aqui será o mapa interativo</Text>
-        </View>
+        <TouchableOpacity onPress={openMapModal} style={styles.mapContainer}>
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: -28.2600,
+              longitude: -52.4091,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+          >
+            <Marker
+              coordinate={{ latitude: -28.2600, longitude: -52.4091 }}
+              title="Passo Fundo"
+              description="Cidade de Passo Fundo, Rio Grande do Sul"
+            />
+          </MapView>
+        </TouchableOpacity>
 
-        {/* Destaques */}
         <Text style={styles.sectionTitle}>Serviços em Destaque</Text>
         <ScrollView horizontal style={styles.servicesContainer}>
           {mockCards.map((card) => (
@@ -124,46 +152,91 @@ function TelaInicial({ navigation }) {
           ))}
         </ScrollView>
 
-        {/* Caixa de Pesquisa */}
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Buscar por categoria"
+            placeholder="Buscar Serviço"
             value={searchText}
             onChangeText={(text) => setSearchText(text)}
           />
         </View>
 
-        {/* Populares */}
+        <ScrollView horizontal style={styles.categoriesCarousel}>
+          {categories.map((category) => (
+            <TouchableOpacity
+              key={category}
+              style={[
+                styles.categoryItem,
+                selectedCategory === category && styles.selectedCategory,
+              ]}
+              onPress={() => handleCategorySelect(category)}
+            >
+              <Text style={styles.categoryText}>{category}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
         <Text style={[styles.sectionTitle, styles.popularesTitle]}>
           Populares
         </Text>
 
         <View style={styles.popularesContainer}>
-          <ScrollView nestedScrollEnabled>
-            {filteredPopulares.map((popular) => (
-              <TouchableOpacity
-                key={popular.id}
-                onPress={() =>
-                  navigation.navigate("TelaServico", { service: popular })
-                }
-                style={styles.popularCard}
-              >
-                <Image
-                  style={styles.popularImage}
-                  source={{ uri: popular.imageSource }}
-                />
-                <View style={styles.popularTextContainer}>
-                  <Text style={styles.popularTitle}>{popular.title}</Text>
-                  <Text style={styles.popularDescription}>
-                    {popular.description}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          {filteredPopulares.length === 0 ? (
+            <Text style={styles.noItemsText}>Nenhum item encontrado para essa categoria.</Text>
+          ) : (
+            <ScrollView style={styles.popularesCarousel}>
+              {filteredPopulares.map((popular) => (
+                <TouchableOpacity
+                  key={popular.id}
+                  onPress={() =>
+                    navigation.navigate("TelaServico", { service: popular })
+                  }
+                  style={styles.popularCard}
+                >
+                  <Image
+                    style={styles.popularImage}
+                    source={{ uri: popular.imageSource }}
+                  />
+                  <View style={styles.popularTextContainer}>
+                    <Text style={styles.popularTitle}>{popular.title}</Text>
+                    <Text style={styles.popularDescription}>
+                      {popular.description}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
         </View>
       </ScrollView>
+
+      <Modal
+        visible={isModalVisible}
+        animationType="fade"
+        transparent={false}
+        onRequestClose={closeMapModal}
+      >
+        <View style={styles.modalContainer}>
+          <TouchableOpacity onPress={closeMapModal} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>Fechar</Text>
+          </TouchableOpacity>
+          <MapView
+            style={styles.mapFullscreen}
+            initialRegion={{
+              latitude: -28.2600,
+              longitude: -52.4091,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+          >
+            <Marker
+              coordinate={{ latitude: -28.2600, longitude: -52.4091 }}
+              title="Passo Fundo"
+              description="Cidade de Passo Fundo, Rio Grande do Sul"
+            />
+          </MapView>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -182,12 +255,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  map: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+  },
   mapText: {
-    fontSize: 16,
+    position: "absolute",
     color: "#fff",
+    fontSize: 16,
+    textAlign: "center",
+    top: 10,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     marginVertical: 10,
     paddingHorizontal: 10,
@@ -197,74 +278,122 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   card: {
-    width: 150,
-    marginRight: 10,
-    backgroundColor: "#F4F4F4",
-    padding: 10,
+    backgroundColor: "#ccc",
     borderRadius: 10,
+    margin: 5,
+    width: 150,
     alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
   },
   cardImage: {
     width: 100,
     height: 100,
     borderRadius: 10,
-    marginBottom: 10,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
+    marginTop: 5,
   },
   cardStatus: {
-    fontSize: 14,
-    color: "green",
+    fontSize: 12,
+    color: "gray",
   },
   searchContainer: {
-    marginVertical: 10,
     paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   searchInput: {
-    height: 50,
-    borderColor: "#ddd",
+    height: 40,
+    borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 5,
     paddingLeft: 10,
   },
-  popularesTitle: {
-    marginTop: 3,
+  categoriesCarousel: {
+    flexDirection: "row",
+    paddingVertical: 10,
+  },
+  categoryItem: {
+    backgroundColor: "#f0f0f0",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 15,
+    marginRight: 10,
+  },
+  selectedCategory: {
+    backgroundColor: "#007bff",
+  },
+  categoryText: {
+    fontSize: 16,
+    color: "#333",
   },
   popularesContainer: {
     flex: 1,
-    maxHeight: 300,
-    backgroundColor: "#f9f9f9",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
     paddingHorizontal: 10,
-    paddingTop: 10,
+    minHeight: 200,
+  },
+  popularesCarousel: {
+    flexDirection: "column",
+    paddingVertical: 10,
+  },
+  noItemsText: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#999",
+    marginTop: 20,
+  },
+  popularesTitle: {
+    marginTop: 20,
   },
   popularCard: {
     flexDirection: "row",
     marginBottom: 15,
-    backgroundColor: "#F4F4F4",
-    borderRadius: 10,
     padding: 10,
+    backgroundColor: "#ccc",
+    borderRadius: 25,
   },
   popularImage: {
-    width: 120,
-    height: 120,
+    width: 80,
+    height: 80,
     borderRadius: 10,
   },
   popularTextContainer: {
-    marginLeft: 15,
-    justifyContent: "center",
     flex: 1,
+    justifyContent: "center",
+    marginLeft: 10,
   },
   popularTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
   },
   popularDescription: {
     fontSize: 14,
-    color: "#555",
+    color: "#666",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "#007bff",
+    padding: 10,
+    borderRadius: 5,
+    zIndex: 10,
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontSize: 18,
+  },
+  mapFullscreen: {
+    width: "100%",
+    height: "100%",
   },
 });
 
