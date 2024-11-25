@@ -53,15 +53,10 @@ const TelaChatGeral = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        {/* Botão de Voltar para a Tela Inicial */}
         <TouchableOpacity
           style={styles.voltar}
-          onPress={() =>
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "TelaInicial" }], // Redireciona para a tela inicial
-            })
-          }
+          onPress={() => navigation.navigate("Início")}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // Área adicional clicável
         >
           <Text style={styles.voltarTexto}>&larr;</Text>
         </TouchableOpacity>
@@ -88,11 +83,13 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     borderBottomWidth: 1,
     borderColor: "#ddd",
+    alignItems: "center", // Centraliza o título
   },
   voltar: {
     position: "absolute",
-    top: 70,
+    top: 50,
     left: 15,
+    padding: 10, // Aumenta a área visível ao redor do texto
   },
   voltarTexto: {
     fontSize: 24, // Maior para facilitar o clique
@@ -102,7 +99,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: 20,
+    marginTop: 10,
   },
   card: {
     padding: 16,
@@ -128,8 +125,8 @@ const styles = StyleSheet.create({
   },
   botao: {
     backgroundColor: "#007bff",
-    paddingVertical: 15, // Aumentado o padding para tornar o botão mais visível
-    paddingHorizontal: 30, // Aumentado o padding horizontal
+    paddingVertical: 15,
+    paddingHorizontal: 30,
     borderRadius: 4,
     alignItems: "center",
     width: "100%",

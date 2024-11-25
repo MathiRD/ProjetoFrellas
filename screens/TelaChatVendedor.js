@@ -53,10 +53,9 @@ const TelaChatVendedor = ({ navigation }) => {
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("TelaChatGeral")}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.voltar}>&larr;</Text>
         </TouchableOpacity>
-        {/* Exibindo a categoria e o nome do profissional no formato "Categoria - Nome" */}
         <Text style={styles.nomeProfissional}>
           {servico?.categoria} - {servico?.nomeProfissional}
         </Text>
