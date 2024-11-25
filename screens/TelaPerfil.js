@@ -12,10 +12,12 @@ import Supabase from "../src/SupabaseClient";
 const TelaPerfil = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
+  const [bannerImage, setBannerImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const defaultImageUrl = "https://cdn.pixabay.com/photo/2024/06/01/14/00/ai-8802304_1280.jpg";
+  const defaultBannerUrl = "https://next-images.123rf.com/index/_next/image/?url=https://assets-cdn.123rf.com/index/static/assets/top-section-bg.jpeg&w=3840&q=75";
 
   const mockServices = [
     {
@@ -40,8 +42,6 @@ const TelaPerfil = ({ navigation }) => {
       try {
         const { data: session, error: sessionError } = await Supabase.auth.getSession();
 
-        console.log(session)
-        
         if (sessionError) {
           setError("Erro ao obter sessão");
           return;
@@ -54,7 +54,7 @@ const TelaPerfil = ({ navigation }) => {
 
           const { data, error } = await Supabase
             .from("profiles")
-            .select("id, username, full_name, avatar_url")
+            .select("id, username, full_name, avatar_url, banner_url, country, city, uf")
             .eq("id", userId)
             .single();
 
@@ -63,6 +63,7 @@ const TelaPerfil = ({ navigation }) => {
           } else {
             setUserData(data);
             setProfileImage(data.avatar_url || defaultImageUrl);
+            setBannerImage(data.banner_url || defaultBannerUrl);
           }
         } else {
           setError("Sessão ou usuário não encontrados.");
@@ -89,14 +90,15 @@ const TelaPerfil = ({ navigation }) => {
     <ScrollView style={styles.container}>
       {userData && (
         <View style={styles.profileContainer}>
+          {/* Banner do Usuário */}
           <View style={styles.coverImageContainer}>
             <Image
-              source={{ uri: userData.coverImageUrl }}
+              source={{ uri: bannerImage }}
               style={styles.coverImage}
             />
           </View>
 
-          
+          {/* Foto de Perfil */}
           <View style={styles.profileImageContainer}>
             <Image
               source={{
@@ -108,7 +110,7 @@ const TelaPerfil = ({ navigation }) => {
 
           <Text style={styles.userName}>{userData.username}</Text>
           <Text style={styles.location}>
-            {userData.country || "Brasil"}, {userData.region || "RS"}
+            {userData.city || "Cidade"}, {userData.uf || "UF"}
           </Text>
 
           <CustomButton
@@ -124,7 +126,7 @@ const TelaPerfil = ({ navigation }) => {
 
       <View style={styles.divider} />
 
-      <Text style={styles.sectionTitle}>Últimos serviços consumidos</Text>
+      <Text style={styles.sectionTitle}>Meus Serviços</Text>
 
       <ScrollView horizontal={true} style={styles.servicesScroll}>
         {mockServices.map((service) => (
@@ -153,9 +155,8 @@ const styles = StyleSheet.create({
   },
   coverImageContainer: {
     backgroundColor: "#f0f0f0",
-    width: "200%",
-    height: 300,
-    borderRadius: 10,
+    width: "100%",
+    height: 200,
     marginBottom: 20,
     overflow: "hidden",
   },
@@ -168,18 +169,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     width: 150,
     height: 150,
-    borderRadius: 65,
+    borderRadius: 75,
     marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "#FFF",
+    borderWidth: 3,
+    borderColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: -70,
+    marginTop: -70, // Para sobrepor a imagem de banner
   },
   profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
   },
   userName: {
     fontSize: 24,
