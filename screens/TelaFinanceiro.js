@@ -6,47 +6,30 @@ import { useWindowDimensions } from "react-native";
 const pagos = [
   {
     id: "1",
-    titulo: "Pintura casa",
-    valor: "200",
-    data: "12/10/2024",
+    titulo: "Pintura de uma parede",
+    valor: "169",
+    data: "05/10/2024",
     status: "Pago",
+    profissional: "Pintor - João",
   },
   {
     id: "2",
-    titulo: "Pintura casa",
-    valor: "200",
-    data: "12/10/2024",
+    titulo: "Instalação do lustre na sala",
+    valor: "269",
+    data: "10/10/2024",
     status: "Pago",
+    profissional: "Eletricista - Fábio",
   },
   {
-    id: "4",
-    titulo: "Pintura casa",
-    data: "12/10/2024",
-    valor: "200",
+    id: "3",
+    titulo: "Instalação da pia da cozinha",
+    valor: "369",
+    data: "15/10/2024",
     status: "Pago",
-  },
-  {
-    id: "5",
-    titulo: "Pintura casa",
-    data: "12/10/2024",
-    valor: "200",
-    status: "Pago",
-  },
-  {
-    id: "6",
-    titulo: "Pintura casa",
-    data: "12/10/2024",
-    valor: "200",
-    status: "Pago",
-  },
-  {
-    id: "7",
-    titulo: "Pintura casa",
-    data: "12/10/2024",
-    valor: "200",
-    status: "Pago",
+    profissional: "Encanador - Jorge",
   },
 ];
+
 
 const pendentes = [
   {
@@ -66,7 +49,7 @@ const pendentes = [
 ];
 
 
-const CardPagamento = ({ titulo, valor, data, status }) => (
+const CardPagamento = ({ titulo, valor, data, status, profissional }) => (
   <View style={styles.card}>
     <View style={styles.cardHeader}>
       <Text style={styles.cardTitle}>{titulo}</Text>
@@ -83,12 +66,11 @@ const CardPagamento = ({ titulo, valor, data, status }) => (
       {status === "Pago" ? "Pago em:" : "Vencimento:"} {data}
     </Text>
     <View style={styles.cardFooter}>
-      <Text style={styles.cardUser}>Lucas Pintor</Text>
+      <Text style={styles.cardUser}>{profissional}</Text>
       <Text style={styles.cardStatus}>Inativo</Text>
     </View>
   </View>
 );
-
 
 const PagosTab = () => (
   <FlatList
@@ -100,6 +82,7 @@ const PagosTab = () => (
         valor={item.valor}
         data={item.data}
         status="Pago"
+        profissional={item.profissional}
       />
     )}
   />
@@ -126,7 +109,7 @@ const TelaFinanceiro = () => {
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: "pagos", title: "Pagos" },
-    { key: "pendentes", title: "Pendentes" },
+    { key: "pendentes", title: "Pendências" },
   ]);
 
   const renderScene = SceneMap({
