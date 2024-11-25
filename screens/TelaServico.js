@@ -14,12 +14,18 @@ function TelaServico({ route, navigation }) {
   return (
     <View style={styles.container}>
       <ScrollView>
-        {/* Header com imagem e detalhes principais */}
+        {}
         <View style={styles.headerContainer}>
           <Image source={{ uri: service.imageSource }} style={styles.headerImage} />
-          <View style={styles.overlay}>
+          {}
+          <View style={styles.headerOverlay} />
+          {}
+          <View style={styles.overlayContent}>
             <Text style={styles.headerTitle}>{service.title}</Text>
-            <Text style={styles.headerLocation}>{service.location}</Text>
+            <View style={styles.locationContainer}>
+              <Text style={styles.locationIcon}>📍</Text>
+              <Text style={styles.locationText}>Passo Fundo - RS</Text>
+            </View>
             <View style={styles.headerStats}>
               <Text style={styles.stat}>⭐ +100 Serviços feitos</Text>
               <Text style={styles.stat}>⭐ {service.experience} Anos no mercado</Text>
@@ -27,13 +33,13 @@ function TelaServico({ route, navigation }) {
           </View>
         </View>
 
-        {/* Descrição */}
+        {}
         <View style={styles.detailsContainer}>
           <Text style={styles.sectionTitle}>Descrição</Text>
           <Text style={styles.description}>{service.description}</Text>
         </View>
 
-        {/* Informações do profissional */}
+        {}
         <View style={styles.profileContainer}>
           <Image source={{ uri: service.profileImage }} style={styles.profileImage} />
           <View style={styles.profileDetails}>
@@ -50,7 +56,7 @@ function TelaServico({ route, navigation }) {
           </View>
         </View>
 
-        {/* Galeria */}
+        {}
         <View style={styles.galleryContainer}>
           <Text style={styles.sectionTitle}>Galeria</Text>
           {service.gallery && Array.isArray(service.gallery) && service.gallery.length > 0 ? (
@@ -64,12 +70,12 @@ function TelaServico({ route, navigation }) {
           )}
         </View>
 
-        {/* Placeholder do mapa */}
+        {}
         <View style={styles.mapPlaceholder}>
           <Text style={styles.mapPlaceholderText}>Mapa será integrado aqui</Text>
         </View>
 
-        {/* Preço e botão */}
+        {}
         <View style={styles.footerContainer}>
           <Text style={styles.price}>
             Preço estimado: <Text style={styles.priceValue}>R$: {service.priceRange}</Text>
@@ -96,7 +102,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  overlay: {
+  headerOverlay: {
+    ...StyleSheet.absoluteFillObject, 
+    backgroundColor: "rgba(0, 0, 0, 0.5)", 
+  },
+  overlayContent: {
     position: "absolute",
     bottom: 20,
     left: 20,
@@ -105,12 +115,22 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#FFF",
+    marginLeft: 7, 
   },
-  headerLocation: {
-    fontSize: 16,
-    color: "#FFF",
-    marginTop: 5,
+  
+  locationContainer: {
+    flexDirection: "row", 
+    alignItems: "center",
+    marginTop: 5, 
   },
+  locationIcon: {
+    fontSize: 12, 
+    marginRight: 2, 
+  },
+  locationText: {
+    fontSize: 14, 
+    color: "#FFF", 
+  },  
   headerStats: {
     marginTop: 10,
   },
