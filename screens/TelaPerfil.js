@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet, ScrollView, Alert, TouchableOpacity } from "react-native";
-import CustomButton from "../src/components/CustomButton";
-import Supabase from "../src/SupabaseClient";
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, Image, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import CustomButton from '../src/components/CustomButton';
+import Supabase from '../src/SupabaseClient';
+import { useFocusEffect } from '@react-navigation/native';
 
 const TelaPerfil = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
@@ -11,84 +12,82 @@ const TelaPerfil = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const defaultImageUrl =
-    "https://cdn.pixabay.com/photo/2024/06/01/14/00/ai-8802304_1280.jpg";
-  const defaultBannerUrl =
-    "https://next-images.123rf.com/index/_next/image/?url=https://assets-cdn.123rf.com/index/static/assets/top-section-bg.jpeg&w=3840&q=75";
+  const defaultImageUrl = 'https://cdn.pixabay.com/photo/2024/06/01/14/00/ai-8802304_1280.jpg';
+  const defaultBannerUrl = 'https://next-images.123rf.com/index/_next/image/?url=https://assets-cdn.123rf.com/index/static/assets/top-section-bg.jpeg&w=3840&q=75';
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data: session, error: sessionError } = await Supabase.auth.getSession();
+  const fetchData = async () => {
+    try {
+      const { data: session, error: sessionError } = await Supabase.auth.getSession();
 
-        if (sessionError) {
-          setError("Erro ao obter sessão");
-          return;
-        }
-
-        const user = session?.session?.user;
-
-        if (user) {
-          const userId = user.id;
-
-          // Buscar dados do perfil do usuário
-          const { data: userProfile, error: userProfileError } =
-            await Supabase.from("profiles")
-              .select("id, username, full_name, avatar_url, banner_url, country, city, uf")
-              .eq("id", userId)
-              .single();
-
-          if (userProfileError) {
-            throw new Error("Erro ao buscar dados do perfil");
-          }
-
-          setUserData(userProfile);
-          setProfileImage(userProfile.avatar_url || defaultImageUrl);
-          setBannerImage(userProfile.banner_url || defaultBannerUrl);
-
-          // Buscar serviços do usuário
-          const { data: userServices, error: servicesError } = await Supabase.from("services")
-            .select("id, id_usuario, title, description, service_img, price, id_status, phone, coordenades, category")
-            .eq("id_usuario", userId);
-
-          if (servicesError) {
-            throw new Error("Erro ao buscar serviços");
-          }
-
-          setServices(userServices || []);
-        } else {
-          throw new Error("Sessão ou usuário não encontrados");
-        }
-      } catch (err) {
-        setError(err.message);
-        Alert.alert("Erro", err.message);
-      } finally {
-        setLoading(false);
+      if (sessionError) {
+        setError('Erro ao obter sessão');
+        return;
       }
-    };
 
-    fetchData();
-  }, []);
+      const user = session?.session?.user;
 
-  
+      if (user) {
+        const userId = user.id;
+
+        // Buscar dados do perfil do usuário
+        const { data: userProfile, error: userProfileError } = await Supabase.from('profiles')
+          .select('id, username, full_name, avatar_url, banner_url, country, city, uf')
+          .eq('id', userId)
+          .single();
+
+        if (userProfileError) {
+          throw new Error('Erro ao buscar dados do perfil');
+        }
+
+        setUserData(userProfile);
+        setProfileImage(userProfile.avatar_url || defaultImageUrl);
+        setBannerImage(userProfile.banner_url || defaultBannerUrl);
+
+        // Buscar serviços do usuário
+        const { data: userServices, error: servicesError } = await Supabase.from('services')
+          .select('id, id_usuario, title, description, service_img, price, id_status, phone, coordenades, category')
+          .eq('id_usuario', userId);
+
+        if (servicesError) {
+          throw new Error('Erro ao buscar serviços');
+        }
+
+        setServices(userServices || []);
+      } else {
+        throw new Error('Sessão ou usuário não encontrados');
+      }
+    } catch (err) {
+      setError(err.message);
+      Alert.alert('Erro', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
   const handleDeleteService = async (serviceId) => {
     try {
-      const { error } = await Supabase.from("services").delete().eq("id", serviceId);
+      const { error } = await Supabase.from('services').delete().eq('id', serviceId);
 
       if (error) {
-        throw new Error("Erro ao excluir o serviço");
+        throw new Error('Erro ao excluir o serviço');
       }
 
-      Alert.alert("Sucesso", "Serviço excluído com sucesso!");
+      Alert.alert('Sucesso', 'Serviço excluído com sucesso!');
       setServices((prev) => prev.filter((service) => service.id !== serviceId));
     } catch (err) {
-      Alert.alert("Erro", err.message);
+      Alert.alert('Erro', err.message);
     }
   };
 
   const handleEditService = (service) => {
     // Passando a função de atualização para a tela de edição
-    navigation.navigate("TelaEditarServico", {
+    navigation.navigate('TelaEditarServico', {
       service,
       onUpdate: (updatedService) => {
         // Atualiza o serviço editado na lista de serviços
@@ -100,7 +99,7 @@ const TelaPerfil = ({ navigation }) => {
   };
 
   const handleAddService = () => {
-    navigation.navigate("TelaAdicionarServico", {
+    navigation.navigate('TelaAdicionarServico', {
       onServiceAdded: () => {
         fetchData(); // Atualiza os serviços após adicionar um novo
       }

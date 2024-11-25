@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,13 @@ import {
   TouchableOpacity,
   Image,
   Modal,
-} from "react-native";
-import MapView, { Marker } from "react-native-maps";
-import Supabase from "../src/SupabaseClient";
-
+} from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import Supabase from '../src/SupabaseClient';
+import { useFocusEffect } from '@react-navigation/native';
 
 function TelaInicial({ navigation }) {
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [populares, setPopulares] = useState([]);
@@ -22,90 +22,90 @@ function TelaInicial({ navigation }) {
 
   const mockCards = [
     {
-      id: "1",
-      title: "Mecânico",
-      status: "Aberto",
+      id: '1',
+      title: 'Mecânico',
+      status: 'Aberto',
       description:
-        "Manutenção básica, troca de óleo, troca de pastilhas de freio, filtro de oleo, e manutenções em geral",
+        'Manutenção básica, troca de óleo, troca de pastilhas de freio, filtro de oleo, e manutenções em geral',
       service_img:
-        "https://cocupo.com/wp-content/uploads/2016/05/que-es-un-mecanico.jpg",
-      category: "Manutenção",
-      priceRange: 200
+        'https://cocupo.com/wp-content/uploads/2016/05/que-es-un-mecanico.jpg',
+      category: 'Manutenção',
+      priceRange: 200,
     },
     {
-      id: "2",
-      title: "Eletricista",
-      status: "Aberto",
+      id: '2',
+      title: 'Eletricista',
+      status: 'Aberto',
       description:
-        "Serviço diarista para auxiliador de instalação elétrica residencial.",
-        service_img:
-        "https://inpolpolimeros.com.br/wp-content/uploads/2023/04/contratar-eletricista-scaled.jpg",
-      category: "Dia a Dia",
-      priceRange: 500
-    },
-    {
-      id: "3",
-      title: "Encanador",
-      status: "Aberto",
-      description:
-        "Serviço diarista para auxílio em instalação doméstica de banheiros no ED Vivenda",
-        service_img:
-        "https://th.bing.com/th/id/R.6b7ce0e8a5dcf64078ca7db0c4f97e77?rik=vk6odBs898iVUQ&pid=ImgRaw&r=0",
-      category: "Dia a Dia",
-      priceRange: 150
-    },
-    {
-      id: "4",
-      title: "Técnico TI",
-      status: "Aberto",
-      description:
-        "Prestação de suporte a formatação de computadores empresariais.",
+        'Serviço diarista para auxiliador de instalação elétrica residencial.',
       service_img:
-        "https://th.bing.com/th/id/OIP.x7wjoKkNsXxnwlM8JX5BhgHaE8?rs=1&pid=ImgDetMain",
-      category: "Informatica",
-      priceRange: 400
+        'https://inpolpolimeros.com.br/wp-content/uploads/2023/04/contratar-eletricista-scaled.jpg',
+      category: 'Dia a Dia',
+      priceRange: 500,
+    },
+    {
+      id: '3',
+      title: 'Encanador',
+      status: 'Aberto',
+      description:
+        'Serviço diarista para auxílio em instalação doméstica de banheiros no ED Vivenda',
+      service_img:
+        'https://th.bing.com/th/id/R.6b7ce0e8a5dcf64078ca7db0c4f97e77?rik=vk6odBs898iVUQ&pid=ImgRaw&r=0',
+      category: 'Dia a Dia',
+      priceRange: 150,
+    },
+    {
+      id: '4',
+      title: 'Técnico TI',
+      status: 'Aberto',
+      description:
+        'Prestação de suporte a formatação de computadores empresariais.',
+      service_img:
+        'https://th.bing.com/th/id/OIP.x7wjoKkNsXxnwlM8JX5BhgHaE8?rs=1&pid=ImgDetMain',
+      category: 'Informatica',
+      priceRange: 400,
     },
   ];
 
   const categories = [
-    { label: "Dia a Dia", value: "dia_a_dia" },
-    { label: "Manutenção", value: "manutencao" },
-    { label: "Tecnologia", value: "tecnologia" },
-    { label: "Mão de obra", value: "mao_de_obra" },
-    { label: "Jardinagem", value: "jardinagem" },
+    { label: 'Dia a Dia', value: 'dia_a_dia' },
+    { label: 'Manutenção', value: 'manutencao' },
+    { label: 'Tecnologia', value: 'tecnologia' },
+    { label: 'Mão de obra', value: 'mao_de_obra' },
+    { label: 'Jardinagem', value: 'jardinagem' },
   ];
-  
 
   const fetchPopulares = async () => {
     try {
       setLoading(true);
-      const { data, error } = await Supabase
-        .from("services")
-        .select("*")
-        .order("title", { ascending: true });
+      const { data, error } = await Supabase.from('services')
+        .select('*')
+        .order('title', { ascending: true });
 
       if (error) {
-        console.error("Erro ao buscar serviços populares:", error);
+        console.error('Erro ao buscar serviços populares:', error);
       } else {
         setPopulares(data);
       }
     } catch (err) {
-      console.error("Erro inesperado:", err);
+      console.error('Erro inesperado:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchPopulares();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchPopulares();
+    }, [])
+  );
 
   const filteredPopulares = populares.filter(
     (popular) =>
       (popular.title.toLowerCase().includes(searchText.toLowerCase()) ||
         !searchText) &&
       (popular.category === selectedCategory || !selectedCategory)
-  );  
+  );
 
   const openMapModal = () => {
     setIsModalVisible(true);
