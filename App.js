@@ -11,6 +11,7 @@ import Routes from "./src/NavBar";
 import TelaPerfil from "./screens/TelaPerfil";
 import TelaServico from "./screens/TelaServico";
 import { NavigationContainer } from "@react-navigation/native";
+import TelaEditarServico from "./screens/TelaEditarServico";
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +40,7 @@ export default function App() {
         <Stack.Screen name="TelaChatVendedor" component={TelaChatVendedor} />
         <Stack.Screen name="TelaPefil" component={TelaPerfil} />
         <Stack.Screen name="TelaServico" component={TelaServico} />
+        <Stack.Screen name="TelaEditarServico" component={TelaEditarServico} />
       </Stack.Navigator>
     </NavigationContainer>
   );

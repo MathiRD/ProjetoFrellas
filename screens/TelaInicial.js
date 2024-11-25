@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,11 +10,15 @@ import {
   Modal,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import Supabase from "../src/SupabaseClient";
+
 
 function TelaInicial({ navigation }) {
   const [searchText, setSearchText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [populares, setPopulares] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const mockCards = [
     {
@@ -23,9 +27,10 @@ function TelaInicial({ navigation }) {
       status: "Aberto",
       description:
         "Manutenção básica, troca de óleo, troca de pastilhas de freio, filtro de oleo, e manutenções em geral",
-      imageSource:
+      service_img:
         "https://cocupo.com/wp-content/uploads/2016/05/que-es-un-mecanico.jpg",
       category: "Manutenção",
+      priceRange: 200
     },
     {
       id: "2",
@@ -33,9 +38,10 @@ function TelaInicial({ navigation }) {
       status: "Aberto",
       description:
         "Serviço diarista para auxiliador de instalação elétrica residencial.",
-      imageSource:
+        service_img:
         "https://inpolpolimeros.com.br/wp-content/uploads/2023/04/contratar-eletricista-scaled.jpg",
       category: "Dia a Dia",
+      priceRange: 500
     },
     {
       id: "3",
@@ -43,9 +49,10 @@ function TelaInicial({ navigation }) {
       status: "Aberto",
       description:
         "Serviço diarista para auxílio em instalação doméstica de banheiros no ED Vivenda",
-      imageSource:
+        service_img:
         "https://th.bing.com/th/id/R.6b7ce0e8a5dcf64078ca7db0c4f97e77?rik=vk6odBs898iVUQ&pid=ImgRaw&r=0",
       category: "Dia a Dia",
+      priceRange: 150
     },
     {
       id: "4",
@@ -53,65 +60,52 @@ function TelaInicial({ navigation }) {
       status: "Aberto",
       description:
         "Prestação de suporte a formatação de computadores empresariais.",
-      imageSource:
+      service_img:
         "https://th.bing.com/th/id/OIP.x7wjoKkNsXxnwlM8JX5BhgHaE8?rs=1&pid=ImgDetMain",
       category: "Informatica",
-    },
-  ];
-
-  const mockPopulares = [
-    {
-      id: "1",
-      title: "Pintor Residencial",
-      description:
-        "Pintura de paredes internas e externas. Serviço altamente recomendado pelos clientes.",
-      imageSource:
-        "https://guia.ar/wp-content/uploads/2021/02/servise-image-5.jpg",
-      category: "Dia a Dia",
-    },
-    {
-      id: "2",
-      title: "Montador de Móveis",
-      description:
-        "Diarista com montagens de móveis planejados. Com ótima reputação e atendendo diversas demandas.",
-      imageSource:
-        "https://www.lhmontagemdemoveis.com.br/wp-content/uploads/2019/11/Montador-De-M%C3%B3veis-EM-Salvador-BA.png",
-      category: "Mão de obra",
-    },
-    {
-      id: "3",
-      title: "Doméstica",
-      description:
-        "Diarista Doméstica. Empresa especializada há mais de 10 anos.",
-      imageSource:
-        "https://vejasp.abril.com.br/wp-content/uploads/2016/12/domestica_-divulgacao-desvia-3-1.jpeg?quality=70&strip=info&w=928",
-      category: "Dia a Dia",
-    },
-    {
-      id: "4",
-      title: "Jardinagem",
-      description:
-        "Manutenção de jardins, poda de árvores e plantas. Empresa destaque no ramo.",
-      imageSource:
-        "https://img.freepik.com/free-photo/smiling-afro-gardener-using-hedge-trimmer-cutting-bushes_651396-1479.jpg",
-      category: "Jardinagem",
+      priceRange: 400
     },
   ];
 
   const categories = [
-    "Dia a Dia",
-    "Informatica",
-    "Mão de obra",
-    "Jardinagem",
-    "Manutenção",
+    { label: "Dia a Dia", value: "dia_a_dia" },
+    { label: "Manutenção", value: "manutencao" },
+    { label: "Tecnologia", value: "tecnologia" },
+    { label: "Mão de obra", value: "mao_de_obra" },
+    { label: "Jardinagem", value: "jardinagem" },
   ];
+  
 
-  const filteredPopulares = mockPopulares.filter(
+  const fetchPopulares = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await Supabase
+        .from("services")
+        .select("*")
+        .order("title", { ascending: true });
+
+      if (error) {
+        console.error("Erro ao buscar serviços populares:", error);
+      } else {
+        setPopulares(data);
+      }
+    } catch (err) {
+      console.error("Erro inesperado:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPopulares();
+  }, []);
+
+  const filteredPopulares = populares.filter(
     (popular) =>
       (popular.title.toLowerCase().includes(searchText.toLowerCase()) ||
         !searchText) &&
       (popular.category === selectedCategory || !selectedCategory)
-  );
+  );  
 
   const openMapModal = () => {
     setIsModalVisible(true);
@@ -162,7 +156,7 @@ function TelaInicial({ navigation }) {
               style={styles.card}
             >
               <Image
-                source={{ uri: card.imageSource }}
+                source={{ uri: card.service_img }}
                 style={styles.cardImage}
               />
               <Text style={styles.cardTitle}>{card.title}</Text>
@@ -183,14 +177,14 @@ function TelaInicial({ navigation }) {
         <ScrollView horizontal style={styles.categoriesCarousel}>
           {categories.map((category) => (
             <TouchableOpacity
-              key={category}
+              key={category.value}
               style={[
                 styles.categoryItem,
-                selectedCategory === category && styles.selectedCategory,
+                selectedCategory === category.value && styles.selectedCategory,
               ]}
-              onPress={() => handleCategorySelect(category)}
+              onPress={() => handleCategorySelect(category.value)}
             >
-              <Text style={styles.categoryText}>{category}</Text>
+              <Text style={styles.categoryText}>{category.label}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -200,7 +194,9 @@ function TelaInicial({ navigation }) {
         </Text>
 
         <View style={styles.popularesContainer}>
-          {filteredPopulares.length === 0 ? (
+          {loading ? (
+            <Text style={styles.noItemsText}>Carregando...</Text>
+          ) : filteredPopulares.length === 0 ? (
             <Text style={styles.noItemsText}>
               Nenhum item encontrado para essa categoria.
             </Text>
@@ -216,7 +212,7 @@ function TelaInicial({ navigation }) {
                 >
                   <Image
                     style={styles.popularImage}
-                    source={{ uri: popular.imageSource }}
+                    source={{ uri: popular.service_img }}
                   />
                   <View style={styles.popularTextContainer}>
                     <Text style={styles.popularTitle}>{popular.title}</Text>
@@ -352,7 +348,7 @@ const styles = StyleSheet.create({
     borderColor: "#8c8c8c",
   },
   selectedCategory: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#ccc",
   },
   categoryText: {
     fontSize: 16,

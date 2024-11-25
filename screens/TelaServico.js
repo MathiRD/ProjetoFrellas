@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import CustomButton from "../src/components/CustomButton";
+import MapView, { Marker } from 'react-native-maps';  // Importação do MapView
 
 function TelaServico({ route, navigation }) {
   const { service } = route.params;
@@ -18,7 +19,7 @@ function TelaServico({ route, navigation }) {
         {/* Header com imagem de fundo */}
         <View style={styles.headerContainer}>
           <Image
-            source={{ uri: service.imageSource }}
+            source={{ uri: service.service_img }}
             style={styles.headerImage}
           />
           <View style={styles.headerOverlay} />
@@ -63,25 +64,40 @@ function TelaServico({ route, navigation }) {
           </View>
         </View>
 
-        {/* Galeria substituída */}
+        {/* Galeria */}
         <View style={styles.galleryContainer}>
           <Text style={styles.sectionTitle}>Galeria</Text>
           <ScrollView horizontal>
-            {[...Array(5)].map((_, index) => (
-              <View key={index} style={styles.galleryPlaceholder}>
-                <Text style={styles.galleryPlaceholderText}>
-                  Imagem {index + 1}
-                </Text>
-              </View>
+            {service.galleryImages?.map((image, index) => (
+              <Image
+                key={index}
+                source={{ uri: image }}
+                style={styles.galleryImage}
+              />
             ))}
           </ScrollView>
         </View>
 
         {/* Mapa */}
         <View style={styles.mapPlaceholder}>
-          <Text style={styles.mapPlaceholderText}>
-            Mapa será integrado aqui
-          </Text>
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: service.latitude || -28.2435, // Substitua pelo valor real de latitude
+              longitude: service.longitude || -52.4096, // Substitua pelo valor real de longitude
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+          >
+            <Marker
+              coordinate={{
+                latitude: service.latitude || -28.2435,
+                longitude: service.longitude || -52.4096,
+              }}
+              title={service.title}
+              description={service.description}
+            />
+          </MapView>
         </View>
 
         {/* Footer */}
@@ -92,7 +108,7 @@ function TelaServico({ route, navigation }) {
           </Text>
           <CustomButton
             title="Contratar agora"
-            onPress={() => alert("Contratação realizada com sucesso!")} // Personalize a ação aqui
+            onPress={() => alert("Contratação realizada com sucesso!")}
           />
         </View>
       </ScrollView>
@@ -126,7 +142,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#FFF",
-    marginLeft: 7,
   },
   locationContainer: {
     flexDirection: "row",
@@ -194,18 +209,11 @@ const styles = StyleSheet.create({
   galleryContainer: {
     padding: 20,
   },
-  galleryPlaceholder: {
+  galleryImage: {
     width: 100,
     height: 100,
     marginRight: 10,
-    backgroundColor: "#E8E8E8",
-    justifyContent: "center",
-    alignItems: "center",
     borderRadius: 10,
-  },
-  galleryPlaceholderText: {
-    fontSize: 14,
-    color: "#888",
   },
   mapPlaceholder: {
     height: 200,
@@ -214,6 +222,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: 20,
     marginVertical: 10,
+    borderRadius: 10,
+  },
+  map: {
+    width: "100%",
+    height: "100%",
     borderRadius: 10,
   },
   mapPlaceholderText: {

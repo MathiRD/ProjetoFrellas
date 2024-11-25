@@ -4,73 +4,97 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  ScrollView,
   SafeAreaView,
+  Alert,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker"; // Importação do Picker
+import * as Location from "expo-location";
 import CustomButton from "../src/components/CustomButton";
+import MapView, { Marker } from "react-native-maps";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Supabase from "../src/SupabaseClient";
+import 'react-native-get-random-values';
 
 const TelaAdicionarServico = ({ navigation }) => {
-  const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
-  const [imgGallery, setImgGallery] = useState("");
+  const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [phone, setPhone] = useState("");
-  const [coordenates, setCoordenates] = useState("");
+  const [coordinates, setCoordinates] = useState(null);
+  const [region, setRegion] = useState({
+    latitude: -23.5505,
+    longitude: -46.6333,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+  const [category, setCategory] = useState("dia a dia"); // Categoria inicial
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [userId, setUserId] = useState(null);
 
-  const fetchUserSession = async () => {
-    try {
-      const { data: session, error: sessionError } = await Supabase.auth.getSession();
-      if (sessionError) throw new Error("Erro ao obter sessão");
-      const user = session?.session?.user;
+  useEffect(() => {
+    const fetchUserSession = async () => {
+      try {
+        const { data: session, error: sessionError } = await Supabase.auth.getSession();
+        if (sessionError) throw new Error("Erro ao obter sessão");
+        const user = session?.session?.user;
+        if (!user) throw new Error("Usuário não encontrado");
+        setUserId(user.id);
+      } catch (err) {
+        Alert.alert("Erro", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      if (!user) throw new Error("Usuário não encontrado");
-      setUserId(user.id);
+    fetchUserSession();
+    requestLocationPermission();
+  }, []);
+
+  const requestLocationPermission = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permissão de localização negada");
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+      setRegion((prev) => ({
+        ...prev,
+        latitude,
+        longitude,
+      }));
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      Alert.alert("Erro ao obter localização", err.message);
     }
   };
 
-  useEffect(() => {
-    fetchUserSession();
-  }, []);
-
   const handleSubmit = async () => {
-    if (!title || !description || !price || !phone) {
+    if (!title || !description || !price || !phone || !coordinates || !category) {
       Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
       return;
     }
 
+    const coordinatesArray = coordinates.split(",").map(coord => parseFloat(coord));
+
     try {
       setLoading(true);
-      const imgArray = imgGallery ? imgGallery.split(",").map((img) => img.trim()) : [];
-      const coordenatesArray = coordenates
-        ? coordenates.split(",").map((coord) => coord.trim())
-        : [];
-
       const { data, error } = await Supabase.from("services").insert([
         {
           id_usuario: userId,
           title,
           description,
-          img_galery: imgArray,
           price: parseFloat(price),
           phone,
-          coordenades: coordenatesArray,
-          id_status: true, // Define o status como ativo
+          coordenades: coordinatesArray,
+          id_status: true,
+          category, // Adicionando categoria ao registro
         },
       ]);
 
       if (error) throw error;
-
       Alert.alert("Sucesso", "Serviço adicionado com sucesso!");
       navigation.goBack();
     } catch (err) {
@@ -80,22 +104,13 @@ const TelaAdicionarServico = ({ navigation }) => {
     }
   };
 
-  if (loading) {
-    return <Text>Carregando...</Text>;
-  }
-
-  if (error) {
-    return <Text>Erro: {error}</Text>;
-  }
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.keyboardAvoidingView}
     >
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Adicionar Serviço</Text>
+        <View style={styles.container}>
 
           <Text style={styles.label}>Título</Text>
           <TextInput
@@ -112,14 +127,6 @@ const TelaAdicionarServico = ({ navigation }) => {
             onChangeText={setDescription}
             placeholder="Descreva seu serviço"
             multiline
-          />
-
-          <Text style={styles.label}>Galeria de Imagens (URLs separadas por vírgula)</Text>
-          <TextInput
-            style={styles.input}
-            value={imgGallery}
-            onChangeText={setImgGallery}
-            placeholder="Ex.: http://imagem1.jpg, http://imagem2.jpg"
           />
 
           <Text style={styles.label}>Preço</Text>
@@ -140,18 +147,70 @@ const TelaAdicionarServico = ({ navigation }) => {
             keyboardType="phone-pad"
           />
 
-          <Text style={styles.label}>Coordenadas (latitude,longitude)</Text>
-          <TextInput
-            style={styles.input}
-            value={coordenates}
-            onChangeText={setCoordenates}
-            placeholder="Ex.: -23.5505,-46.6333"
-          />
+          <Text style={styles.label}>Categoria</Text>
+          <Picker
+            selectedValue={category}
+            onValueChange={(itemValue) => setCategory(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Dia a dia" value="dia_a_dia" />
+            <Picker.Item label="Manutenção" value="manutencao" />
+            <Picker.Item label="Tecnologia" value="tecnologia" />
+            <Picker.Item label="Mão de obra" value="mao_de_obra" />
+            <Picker.Item label="Jardinagem" value="jardinagem" />
+          </Picker>
+
+          <View style={styles.mapContainer}>
+            <MapView
+              style={styles.map}
+              region={region}
+              onPress={(e) => {
+                const { latitude, longitude } = e.nativeEvent.coordinate;
+                setCoordinates(`${latitude},${longitude}`);
+                setRegion((prev) => ({
+                  ...prev,
+                  latitude,
+                  longitude,
+                }));
+              }}
+            >
+              {coordinates && (
+                <Marker
+                  coordinate={{
+                    latitude: parseFloat(coordinates.split(",")[0]),
+                    longitude: parseFloat(coordinates.split(",")[1]),
+                  }}
+                />
+              )}
+            </MapView>
+
+            <GooglePlacesAutocomplete
+              placeholder="Pesquise um endereço"
+              onPress={(data, details = null) => {
+                const { lat, lng } = details.geometry.location;
+                setCoordinates(`${lat},${lng}`);
+                setRegion((prev) => ({
+                  ...prev,
+                  latitude: lat,
+                  longitude: lng,
+                }));
+              }}
+              fetchDetails
+              query={{
+                key: "AIzaSyDKy-9pgFnme2fBWP63ebe8Y2AnD3_fQM4",
+                language: "pt-BR",
+              }}
+              styles={{
+                textInput: styles.input,
+                container: styles.autocompleteContainer,
+              }}
+            />
+          </View>
 
           <View style={styles.buttonContainer}>
             <CustomButton title="Adicionar Serviço" onPress={handleSubmit} />
           </View>
-        </ScrollView>
+        </View>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
@@ -166,7 +225,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   container: {
-    flexGrow: 1,
+    flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
   },
@@ -189,6 +248,25 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginBottom: 15,
     fontSize: 16,
+  },
+  picker: {
+    height: 50,
+    marginBottom: 15,
+  },
+  mapContainer: {
+    position: "relative",
+    marginTop: 5,
+  },
+  map: {
+    height: 260,
+    width: "100%",
+  },
+  autocompleteContainer: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    right: 10,
+    zIndex: 1,
   },
   buttonContainer: {
     alignItems: "center",
