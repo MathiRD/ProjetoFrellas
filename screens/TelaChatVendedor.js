@@ -12,14 +12,11 @@ import { useRoute } from "@react-navigation/native";
 
 const TelaChatVendedor = ({ navigation }) => {
   const route = useRoute();
-  const { servico } = route.params || {}; // Garante que route.params sempre exista
-
+  const { servico } = route.params || {}; 
   const [mensagens, setMensagens] = useState([
     {
       id: "1",
-      texto: `Olá, estou interessado em ${
-        servico?.categoria || "seu serviço"
-      }.`,
+      texto: `Olá, estou interessado seu serviço`,
       enviadoPorUsuario: true,
     },
     { id: "2", texto: "Ótimo! Como posso ajudar?", enviadoPorUsuario: false },
@@ -55,17 +52,16 @@ const TelaChatVendedor = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
-      {/* Cabeçalho */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate("TelaChatGeral")}>
           <Text style={styles.voltar}>&larr;</Text>
         </TouchableOpacity>
+        {/* Exibindo a categoria e o nome do profissional no formato "Categoria - Nome" */}
         <Text style={styles.nomeProfissional}>
-          {servico?.categoria || "Serviço"}
+          {servico?.categoria} - {servico?.nomeProfissional}
         </Text>
       </View>
 
-      {/* Lista de mensagens */}
       <FlatList
         data={mensagens}
         keyExtractor={(item) => item.id}
@@ -73,7 +69,6 @@ const TelaChatVendedor = ({ navigation }) => {
         contentContainerStyle={styles.listaMensagens}
       />
 
-      {/* Campo de entrada de texto */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -105,7 +100,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   voltar: {
-    fontSize: 30, // Aumente o tamanho da flecha
+    fontSize: 30, 
     color: "#333",
     marginRight: 8,
   },
