@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,23 +8,85 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import CustomButton from "../src/components/CustomButton";
+import Supabase from "../src/SupabaseClient";
 
-const TelaTornarVendedor = ({ navigation }) => {
+const TelaAdicionarServico = ({ navigation }) => {
   const [description, setDescription] = useState("");
-  const [specialization, setSpecialization] = useState("");
-  const [portfolioLink, setPortfolioLink] = useState("");
-  const [experience, setExperience] = useState("");
-  const [certifications, setCertifications] = useState("");
-  const [languages, setLanguages] = useState("");
-  const [priceRange, setPriceRange] = useState("");
-  const [availability, setAvailability] = useState("");
+  const [title, setTitle] = useState("");
+  const [imgGallery, setImgGallery] = useState("");
+  const [price, setPrice] = useState("");
+  const [phone, setPhone] = useState("");
+  const [coordenates, setCoordenates] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(null);
 
-  const handleSubmit = () => {
-    console.log("Dados do vendedor enviados!");
-    navigation.goBack();
+  const fetchUserSession = async () => {
+    try {
+      const { data: session, error: sessionError } = await Supabase.auth.getSession();
+      if (sessionError) throw new Error("Erro ao obter sessão");
+      const user = session?.session?.user;
+
+      if (!user) throw new Error("Usuário não encontrado");
+      setUserId(user.id);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchUserSession();
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!title || !description || !price || !phone) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const imgArray = imgGallery ? imgGallery.split(",").map((img) => img.trim()) : [];
+      const coordenatesArray = coordenates
+        ? coordenates.split(",").map((coord) => coord.trim())
+        : [];
+
+      const { data, error } = await Supabase.from("services").insert([
+        {
+          id_usuario: userId,
+          title,
+          description,
+          img_galery: imgArray,
+          price: parseFloat(price),
+          phone,
+          coordenades: coordenatesArray,
+          id_status: true, // Define o status como ativo
+        },
+      ]);
+
+      if (error) throw error;
+
+      Alert.alert("Sucesso", "Serviço adicionado com sucesso!");
+      navigation.goBack();
+    } catch (err) {
+      Alert.alert("Erro", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <Text>Carregando...</Text>;
+  }
+
+  if (error) {
+    return <Text>Erro: {error}</Text>;
+  }
 
   return (
     <KeyboardAvoidingView
@@ -33,76 +95,61 @@ const TelaTornarVendedor = ({ navigation }) => {
     >
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Tornar-se um Vendedor</Text>
+          <Text style={styles.title}>Adicionar Serviço</Text>
+
+          <Text style={styles.label}>Título</Text>
+          <TextInput
+            style={styles.input}
+            value={title}
+            onChangeText={setTitle}
+            placeholder="Digite o título do serviço"
+          />
 
           <Text style={styles.label}>Descrição</Text>
           <TextInput
             style={styles.input}
             value={description}
             onChangeText={setDescription}
-            placeholder="Descreva seu trabalho"
+            placeholder="Descreva seu serviço"
             multiline
           />
 
-          <Text style={styles.label}>Especialização</Text>
+          <Text style={styles.label}>Galeria de Imagens (URLs separadas por vírgula)</Text>
           <TextInput
             style={styles.input}
-            value={specialization}
-            onChangeText={setSpecialization}
-            placeholder="Sua área de especialização"
+            value={imgGallery}
+            onChangeText={setImgGallery}
+            placeholder="Ex.: http://imagem1.jpg, http://imagem2.jpg"
           />
 
-          <Text style={styles.label}>Link para Portfólio</Text>
+          <Text style={styles.label}>Preço</Text>
           <TextInput
             style={styles.input}
-            value={portfolioLink}
-            onChangeText={setPortfolioLink}
-            placeholder="Link para seu portfólio (opcional)"
-            keyboardType="url"
+            value={price}
+            onChangeText={setPrice}
+            placeholder="Digite o preço"
+            keyboardType="numeric"
           />
 
-          <Text style={styles.label}>Experiência Profissional</Text>
+          <Text style={styles.label}>Telefone</Text>
           <TextInput
             style={styles.input}
-            value={experience}
-            onChangeText={setExperience}
-            placeholder="Ex.: 5 anos como designer"
+            value={phone}
+            onChangeText={setPhone}
+            placeholder="Digite o número de telefone"
+            keyboardType="phone-pad"
           />
 
-          <Text style={styles.label}>Certificações</Text>
+          <Text style={styles.label}>Coordenadas (latitude,longitude)</Text>
           <TextInput
             style={styles.input}
-            value={certifications}
-            onChangeText={setCertifications}
-            placeholder="Ex.: Certificação Google Ads, UX Design"
-          />
-
-          <Text style={styles.label}>Idiomas que Domina</Text>
-          <TextInput
-            style={styles.input}
-            value={languages}
-            onChangeText={setLanguages}
-            placeholder="Ex.: Português, Inglês, Espanhol"
-          />
-
-          <Text style={styles.label}>Faixa de Preço</Text>
-          <TextInput
-            style={styles.input}
-            value={priceRange}
-            onChangeText={setPriceRange}
-            placeholder="Ex.: A partir de R$500"
-          />
-
-          <Text style={styles.label}>Disponibilidade</Text>
-          <TextInput
-            style={styles.input}
-            value={availability}
-            onChangeText={setAvailability}
-            placeholder="Ex.: Segunda a Sexta, das 9h às 18h"
+            value={coordenates}
+            onChangeText={setCoordenates}
+            placeholder="Ex.: -23.5505,-46.6333"
           />
 
           <View style={styles.buttonContainer}>
-            <CustomButton title="Enviar para Avaliação" onPress={handleSubmit} />
+            <CustomButton title="Adicionar Serviço" onPress={handleSubmit} />
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -141,7 +188,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingLeft: 10,
     marginBottom: 15,
-    fontSize: 16, // Ajustado para consistência com a tela EditarPerfil
+    fontSize: 16,
   },
   buttonContainer: {
     alignItems: "center",
@@ -149,4 +196,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TelaTornarVendedor;
+export default TelaAdicionarServico;
