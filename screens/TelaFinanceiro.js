@@ -3,51 +3,52 @@ import { View, Text, StyleSheet, FlatList, TextInput } from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useWindowDimensions } from "react-native";
 
-const pagos = [
-  {
-    id: "1",
-    titulo: "Pintura de uma parede",
-    valor: "169",
-    data: "05/10/2024",
-    status: "Pago",
-    profissional: "Pintor - João",
-  },
-  {
-    id: "2",
-    titulo: "Instalação do lustre na sala",
-    valor: "269",
-    data: "10/10/2024",
-    status: "Pago",
-    profissional: "Eletricista - Fábio",
-  },
-  {
-    id: "3",
-    titulo: "Instalação da pia da cozinha",
-    valor: "369",
-    data: "15/10/2024",
-    status: "Pago",
-    profissional: "Encanador - Jorge",
-  },
-];
-
-
-const pendentes = [
-  {
-    id: "1",
-    titulo: "Pintura casa",
-    valor: "200",
-    data: "12/10/2024",
-    status: "Pendente",
-  },
-  {
-    id: "2",
-    titulo: "Pintura casa",
-    valor: "200",
-    data: "12/10/2024",
-    status: "Pendente",
-  },
-];
-
+const pagamentosIniciais = {
+  pagos: [
+    {
+      id: "1",
+      titulo: "Pintura de uma parede",
+      valor: "150",
+      data: "05/10/2024",
+      status: "Pago",
+      profissional: "Pintor - João",
+    },
+    {
+      id: "2",
+      titulo: "Instalação do lustre na sala",
+      valor: "300",
+      data: "10/10/2024",
+      status: "Pago",
+      profissional: "Eletricista - Fábio",
+    },
+    {
+      id: "3",
+      titulo: "Instalação da pia da cozinha",
+      valor: "400",
+      data: "15/10/2024",
+      status: "Pago",
+      profissional: "Encanador - Jorge",
+    },
+  ],
+  pendentes: [
+    {
+      id: "1",
+      titulo: "Pintura de uma parede",
+      valor: "200",
+      data: "12/10/2024",
+      status: "Pendente",
+      profissional: "Pintor - João",
+    },
+    {
+      id: "2",
+      titulo: "Instalação do lustre na sala",
+      valor: "200",
+      data: "12/10/2024",
+      status: "Pendente",
+      profissional: "Eletricista - Fábio",
+    },
+  ],
+};
 
 const CardPagamento = ({ titulo, valor, data, status, profissional }) => (
   <View style={styles.card}>
@@ -72,9 +73,9 @@ const CardPagamento = ({ titulo, valor, data, status, profissional }) => (
   </View>
 );
 
-const PagosTab = () => (
+const PagosTab = ({ pagamentos }) => (
   <FlatList
-    data={pagos}
+    data={pagamentos}
     keyExtractor={(item) => item.id}
     renderItem={({ item }) => (
       <CardPagamento
@@ -88,9 +89,9 @@ const PagosTab = () => (
   />
 );
 
-const PendentesTab = () => (
+const PendentesTab = ({ pagamentos }) => (
   <FlatList
-    data={pendentes}
+    data={pagamentos}
     keyExtractor={(item) => item.id}
     renderItem={({ item }) => (
       <CardPagamento
@@ -98,11 +99,11 @@ const PendentesTab = () => (
         valor={item.valor}
         data={item.data}
         status="Pendente"
+        profissional={item.profissional}
       />
     )}
   />
 );
-
 
 const TelaFinanceiro = () => {
   const layout = useWindowDimensions();
@@ -111,23 +112,46 @@ const TelaFinanceiro = () => {
     { key: "pagos", title: "Pagos" },
     { key: "pendentes", title: "Pendências" },
   ]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pagamentos, setPagamentos] = useState(pagamentosIniciais);
 
-  const renderScene = SceneMap({
-    pagos: PagosTab,
-    pendentes: PendentesTab,
-  });
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+
+    const filteredPagos = pagamentosIniciais.pagos.filter((item) =>
+      item.titulo.toLowerCase().includes(query.toLowerCase())
+    );
+    const filteredPendentes = pagamentosIniciais.pendentes.filter((item) =>
+      item.titulo.toLowerCase().includes(query.toLowerCase())
+    );
+
+    setPagamentos({
+      pagos: filteredPagos,
+      pendentes: filteredPendentes,
+    });
+  };
+
+  const renderScene = ({ route }) => {
+    switch (route.key) {
+      case "pagos":
+        return <PagosTab pagamentos={pagamentos.pagos} />;
+      case "pendentes":
+        return <PendentesTab pagamentos={pagamentos.pendentes} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <View style={styles.container}>
-      { }
       <View style={styles.searchBar}>
         <TextInput
           style={styles.searchInput}
           placeholder="Pesquisar por pagamentos"
+          value={searchQuery}
+          onChangeText={handleSearch}
         />
       </View>
-
-      { }
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
@@ -136,13 +160,12 @@ const TelaFinanceiro = () => {
         renderTabBar={(props) => (
           <TabBar
             {...props}
-            indicatorStyle={styles.tabIndicator} 
-            style={styles.tabBar} 
-            labelStyle={styles.tabLabel} 
-            activeColor="#007AFF" 
-            inactiveColor="#000000" 
+            indicatorStyle={styles.tabIndicator}
+            style={styles.tabBar}
+            labelStyle={styles.tabLabel}
+            activeColor="#007AFF"
+            inactiveColor="#000000"
           />
-
         )}
       />
     </View>
@@ -216,15 +239,15 @@ const styles = StyleSheet.create({
     color: "red",
   },
   tabBar: {
-    backgroundColor: "#E5E9F2", 
+    backgroundColor: "#E5E9F2",
   },
   tabIndicator: {
-    backgroundColor: "#007AFF", 
-    height: 3, 
+    backgroundColor: "#007AFF",
+    height: 3,
   },
   tabLabel: {
-    fontWeight: "bold", 
-    fontSize: 14, 
+    fontWeight: "bold",
+    fontSize: 14,
   },
 });
 
