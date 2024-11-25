@@ -56,7 +56,6 @@ const pagamentosIniciais = {
       profissional: "Técnico TI - Rômulo",
     },
   ],
-  
 };
 
 const CardPagamento = ({ titulo, valor, data, status, profissional }) => (
@@ -209,6 +208,12 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: "#DDD",
+    // Adicionando o box-shadow
+    shadowColor: "#000", // Cor da sombra
+    shadowOffset: { width: 0, height: 2 }, // Posição da sombra
+    shadowOpacity: 0.1, // Opacidade da sombra
+    shadowRadius: 4, // Raio de suavização da sombra
+    elevation: 5, // Elevação para Android (equivalente ao shadow)
   },
   cardHeader: {
     flexDirection: "row",
@@ -259,5 +264,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-
 export default TelaFinanceiro;
