@@ -1,111 +1,110 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-
-function ServiceCard({ title, imageSource, status }) {
-  return (
-    <TouchableOpacity style={styles.card}>
-      <Image source={{ uri: imageSource }} style={styles.cardImage} />
-      <Text style={styles.cardTitle}>{title}</Text>
-      <Text style={styles.cardStatus}>{status}</Text>
-    </TouchableOpacity>
-  );
-}
 
 function TelaInicial() {
-  const navigation = useNavigation();
+  const [searchText, setSearchText] = useState('');
+  const mockCards = [
+    {
+      id: '1',
+      title: 'Mecânico',
+      status: 'Aberto',
+      description: 'Manutenção básica, troca de óleo, troca de pastilhas de freio, filtro de oleo, e manutenções em geral',
+      imageSource: 'https://cocupo.com/wp-content/uploads/2016/05/que-es-un-mecanico.jpg',
+    },
+    {
+      id: '2',
+      title: 'Eletricista',
+      status: 'Aberto',
+      description: 'Serviço diarista para auxiliador de intalação elétrica residencial.',
+      imageSource: 'https://inpolpolimeros.com.br/wp-content/uploads/2023/04/contratar-eletricista-scaled.jpg',
+    },
+    {
+      id: '3',
+      title: 'Encanador',
+      status: 'Aberto',
+      description: 'Serviço diarista para auxilio em instalção domestica de banheiros no ED Vivenda',
+      imageSource: 'https://th.bing.com/th/id/R.6b7ce0e8a5dcf64078ca7db0c4f97e77?rik=vk6odBs898iVUQ&pid=ImgRaw&r=0',
+    },
+    {
+      id: '4',
+      title: 'Técnico TI',
+      status: 'Aberto',
+      description: 'Prestação de suporte a formatação de computadores empresariais.',
+      imageSource: 'https://th.bing.com/th/id/OIP.x7wjoKkNsXxnwlM8JX5BhgHaE8?rs=1&pid=ImgDetMain',
+    },
+  ];
+
+  const mockPopulares = [
+    {
+      id: '1',
+      title: 'Pintor Residencial',
+      description: 'Pintura de paredes internas e externas. Serviço altamente recomendado pelos clientes.',
+      imageSource: 'https://guia.ar/wp-content/uploads/2021/02/servise-image-5.jpg',
+    },
+    {
+      id: '2',
+      title: 'Montador de Móveis',
+      description: 'Diarista com montagens de móveis planejados. Com ótima reputação e atendendo diversas demandas.',
+      imageSource: 'https://www.lhmontagemdemoveis.com.br/wp-content/uploads/2019/11/Montador-De-M%C3%B3veis-EM-Salvador-BA.png',
+    },
+    {
+      id: '3',
+      title: 'Doméstica',
+      description: 'Diarista Doméstica. Empresa especializada há mais de 10 anos.',
+      imageSource: 'https://vejasp.abril.com.br/wp-content/uploads/2016/12/domestica_-divulgacao-desvia-3-1.jpeg?quality=70&strip=info&w=928',
+    },
+    {
+      id: '4',
+      title: 'Jardinagem',
+      description: 'Manutenção de jardins, poda de árvores e plantas. Empresa destaque no ramo.',
+      imageSource: 'https://img.freepik.com/free-photo/smiling-afro-gardener-using-hedge-trimmer-cutting-bushes_651396-1479.jpg',
+    },
+  ];
+
+  const filteredPopulares = mockPopulares.filter(popular =>
+    popular.title.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
     <View style={styles.container}>
-      {/* Scroll principal */}
       <ScrollView style={styles.mainScroll} contentContainerStyle={{ flexGrow: 1 }}>
-        {/* Mapa */}
         <View style={styles.mapContainer}>
           <Text style={styles.mapText}>Mapa - Aqui será o mapa interativo</Text>
         </View>
 
-        {/* Serviços em Destaque */}
         <Text style={styles.sectionTitle}>Serviços em Destaque</Text>
         <ScrollView horizontal style={styles.servicesContainer}>
-          <ServiceCard
-            title="Mecânico"
-            status="Aberto"
-            imageSource="https://cocupo.com/wp-content/uploads/2016/05/que-es-un-mecanico.jpg"
-          />
-          <ServiceCard
-            title="Eletricista"
-            status="Aberto"
-            imageSource="https://inpolpolimeros.com.br/wp-content/uploads/2023/04/contratar-eletricista-scaled.jpg"
-          />
-          <ServiceCard
-            title="Encanador"
-            status="Aberto"
-            imageSource="https://th.bing.com/th/id/R.6b7ce0e8a5dcf64078ca7db0c4f97e77?rik=vk6odBs898iVUQ&pid=ImgRaw&r=0"
-          />
-          <ServiceCard
-            title="Técnico TI"
-            status="Aberto"
-            imageSource="https://th.bing.com/th/id/OIP.x7wjoKkNsXxnwlM8JX5BhgHaE8?rs=1&pid=ImgDetMain"
-          />
+          {mockCards.map((card) => (
+            <TouchableOpacity key={card.id} style={styles.card}>
+              <Image source={{ uri: card.imageSource }} style={styles.cardImage} />
+              <Text style={styles.cardTitle}>{card.title}</Text>
+              <Text style={styles.cardStatus}>{card.status}</Text>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
 
-        {/* Campo de Busca */}
         <View style={styles.searchContainer}>
-          <TextInput style={styles.searchInput} placeholder="Encontrar Serviços" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar por categoria"
+            value={searchText}
+            onChangeText={(text) => setSearchText(text)}
+          />
         </View>
 
-        {/* Populares */}
         <Text style={[styles.sectionTitle, styles.popularesTitle]}>Populares</Text>
 
-        {/* Scroll da seção Populares */}
         <View style={styles.popularesContainer}>
-          <ScrollView nestedScrollEnabled style={styles.popularScroll} contentContainerStyle={{ paddingBottom: 20 }}>
-            <View style={styles.popularCard}>
-              <Image style={styles.popularImage} source={{ uri: 'https://guia.ar/wp-content/uploads/2021/02/servise-image-5.jpg' }} />
-              <View style={styles.popularTextContainer}>
-                <Text style={styles.popularTitle}>Pintor Residencial</Text>
-                <Text style={styles.popularDescription}>Pintura de paredes internas e externas.
-                  Serviço altamente recomendado pelos clientes.</Text>
+          <ScrollView nestedScrollEnabled>
+            {filteredPopulares.map((popular) => (
+              <View key={popular.id} style={styles.popularCard}>
+                <Image style={styles.popularImage} source={{ uri: popular.imageSource }} />
+                <View style={styles.popularTextContainer}>
+                  <Text style={styles.popularTitle}>{popular.title}</Text>
+                  <Text style={styles.popularDescription}>{popular.description}</Text>
+                </View>
               </View>
-            </View>
-
-            <View style={styles.popularCard}>
-              <Image style={styles.popularImage} source={{ uri: 'https://www.lhmontagemdemoveis.com.br/wp-content/uploads/2019/11/Montador-De-M%C3%B3veis-EM-Salvador-BA.png' }} />
-              <View style={styles.popularTextContainer}>
-                <Text style={styles.popularTitle}>Montador de móveis</Text>
-                <Text style={styles.popularDescription}>Diarista com montagens de móveis planejados.
-                  Com ótima reputação e atendendo diversas demandas.</Text>
-              </View>
-            </View>
-
-            <View style={styles.popularCard}>
-              <Image style={styles.popularImage} source={{ uri: 'https://vejasp.abril.com.br/wp-content/uploads/2016/12/domestica_-divulgacao-desvia-3-1.jpeg?quality=70&strip=info&w=928' }} />
-              <View style={styles.popularTextContainer}>
-                <Text style={styles.popularTitle}>Doméstica</Text>
-                <Text style={styles.popularDescription}>Diarista Doméstica.
-                  Empresa especializada a mais de 1o anos.</Text>
-              </View>
-            </View>
-
-            <View style={styles.popularCard}>
-              <Image style={styles.popularImage} source={{ uri: 'https://img.freepik.com/free-photo/smiling-afro-gardener-using-hedge-trimmer-cutting-bushes_651396-1479.jpg' }} />
-              <View style={styles.popularTextContainer}>
-                <Text style={styles.popularTitle}>Jardinagem</Text>
-                <Text style={styles.popularDescription}>Manutenção de jardins, poda de árvores e plantas.
-                  Empresa destaque no ramo.
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.popularCard}>
-              <Image style={styles.popularImage} source={{ uri: 'https://weremote.net/wp-content/uploads/2022/07/paletas-colores-ordenador-escritorio.jpg' }} />
-              <View style={styles.popularTextContainer}>
-                <Text style={styles.popularTitle}>Design Gráfico</Text>
-                <Text style={styles.popularDescription}>Criação de logotipos e catálogos. 
-                  Empresa situada no mercado de Marketing.
-                </Text>
-              </View>
-            </View>
+            ))}
           </ScrollView>
         </View>
       </ScrollView>
@@ -179,18 +178,12 @@ const styles = StyleSheet.create({
   },
   popularesContainer: {
     flex: 1,
+    maxHeight: 300,
     backgroundColor: '#f9f9f9',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.2,
     paddingHorizontal: 10,
     paddingTop: 10,
-  },
-  popularScroll: {
-    maxHeight: 250, 
   },
   popularCard: {
     flexDirection: 'row',
