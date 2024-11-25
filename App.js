@@ -8,6 +8,7 @@ import TelaTornarVendedor from "./screens/TelaTornarVendedor";
 import TelaChatGeral from "./screens/TelaChatGeral";
 import TelaChatVendedor from "./screens/TelaChatVendedor";
 import Routes from "./src/NavBar";
+import TelaPerfil from "./screens/TelaPerfil";
 import { NavigationContainer } from "@react-navigation/native";
 
 const Stack = createNativeStackNavigator();
@@ -27,6 +28,7 @@ export default function App() {
         <Stack.Screen name="TelaTornarVendedor" component={TelaTornarVendedor} options={{ headerShown: true, title: "Se tornar um Vendedor" }} />
         <Stack.Screen name="TelaChatGeral" component={TelaChatGeral} />
         <Stack.Screen name="TelaChatVendedor" component={TelaChatVendedor} />
+        <Stack.Screen name="TelaPefil" component={TelaPerfil} />
       </Stack.Navigator>
     </NavigationContainer>
   );

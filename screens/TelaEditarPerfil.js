@@ -1,53 +1,159 @@
-import React, { useState } from "react";
-import { View, TextInput, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
-import ImagePicker from "react-native-image-picker";
+import React, { useState, useEffect } from "react";
+import { View, TextInput, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, Button, Platform } from "react-native";
 import CustomButton from "../src/components/CustomButton";
+import Supabase from "../src/SupabaseClient";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const TelaEditarPerfil = ({ navigation }) => {
+  const [userData, setUserData] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [dob, setDob] = useState("");
+  const [birthday, setBirthday] = useState(new Date());
   const [country, setCountry] = useState("");
-  const [profileImage, setProfileImage] = useState("https://example.com/default-profile.png");
+  const [password, setPassword] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const saveChanges = () => {
-    console.log("Mudanças salvas:", { name, email, password, dob, country });
-    navigation.goBack();
-  };
+  const defaultImageUrl = "https://cdn.pixabay.com/photo/2024/06/01/14/00/ai-8802304_1280.jpg";
 
-  const chooseImage = () => {
-    const options = {
-      title: "Selecionar Imagem",
-      storageOptions: {
-        skipBackup: true,
-        path: "images",
-      },
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data: session, error: sessionError } = await Supabase.auth.getSession();
+        if (sessionError) {
+          setError(`Erro ao obter sessão: ${sessionError.message}`);
+          return;
+        }
+
+        const user = session?.session?.user;
+
+        if (user) {
+          const userId = user.id;
+
+          const { data: profileData, error: profileError } = await Supabase
+            .from("profiles")
+            .select("id, full_name, avatar_url, birthday")
+            .eq("id", userId)
+            .single();
+
+          if (profileError) {
+            setError(`Erro ao carregar dados do perfil: ${profileError.message}`);
+          } else {
+            setUserData(user);
+            setName(profileData.full_name || "");
+            setEmail(user.email || "");
+            setBirthday(new Date(profileData.birthday) || new Date());
+            setCountry(profileData.country || "");
+            setProfileImage(profileData.avatar_url || defaultImageUrl);
+          }
+        } else {
+          setError("Sessão ou usuário não encontrados.");
+        }
+      } catch (err) {
+        setError(`Erro ao carregar os dados do usuário: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    ImagePicker.showImagePicker(options, (response) => {
-      if (response.didCancel) {
-        console.log("Usuário cancelou a seleção de imagem");
-      } else if (response.error) {
-        console.log("Erro:", response.error);
-      } else {
-        setProfileImage(response.uri);
+    fetchUserData();
+  }, []);
+
+  const saveImageUrl = async (url) => {
+    try {
+      const { data, error } = await Supabase
+        .from("profiles")
+        .update({ avatar_url: url })
+        .eq("id", userData.id);
+
+      if (error) {
+        setError("Erro ao atualizar imagem de perfil.");
       }
-    });
+    } catch (err) {
+      setError("Erro ao salvar a URL da imagem.");
+    }
+  };
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleLinkSubmit = () => {
+    if (imageUrl) {
+      setProfileImage(imageUrl);
+      saveImageUrl(imageUrl);
+      setModalVisible(false);
+      setImageUrl("");
+    } else {
+      setError("Link inválido");
+    }
+  };
+
+  const saveChanges = async () => {
+    try {
+      const { data, error } = await Supabase
+        .from("profiles")
+        .update({ full_name: name, birthday, country })
+        .eq("id", userData.id);
+
+      if (error) {
+        setError(`Erro ao atualizar perfil: ${error.message}`);
+      }
+
+      if (newEmail && newEmail !== email) {
+        const { error: emailError } = await Supabase.auth.updateUser({
+          email: newEmail,
+        });
+
+        if (emailError) {
+          setError(`Erro ao atualizar e-mail: ${emailError.message}`);
+        }
+      }
+
+      if (password) {
+        const { error: passwordError } = await Supabase.auth.updateUser({
+          password: password,
+        });
+
+        if (passwordError) {
+          setError(`Erro ao atualizar senha: ${passwordError.message}`);
+        }
+      }
+    } catch (err) {
+      setError("Erro ao salvar alterações.");
+    }
+  };
+
+  if (loading) {
+    return <Text>Carregando...</Text>;
+  }
+
+  if (error) {
+    return <Text>{error}</Text>;
+  }
+
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || birthday;
+    setShowDatePicker(Platform.OS === 'ios' ? true : false);
+    setBirthday(currentDate);
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Editar Perfil</Text>
 
-      <TouchableOpacity onPress={chooseImage} style={styles.profileImageContainer}>
+      <TouchableOpacity onPress={openModal} style={styles.profileImageContainer}>
         <View style={styles.profileImageWrapper}>
           <Image
-            source={{ uri: profileImage }}
+            source={{ uri: profileImage || defaultImageUrl }}
             style={styles.profileImage}
           />
         </View>
-        <Text style={styles.changeImageText}>Clique para alterar a imagem</Text>
       </TouchableOpacity>
 
       <TextInput
@@ -63,23 +169,29 @@ const TelaEditarPerfil = ({ navigation }) => {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        editable={false}  // Impede alteração direta do e-mail
       />
 
       <TextInput
         style={styles.input}
-        placeholder="Senha"
+        placeholder="Nova Senha"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Data de Nascimento"
-        value={dob}
-        onChangeText={setDob}
-        keyboardType="numeric"
-      />
+      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
+        <Text style={styles.dateText}>Data de Nascimento: {birthday.toLocaleDateString()}</Text>
+      </TouchableOpacity>
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={birthday}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
+        />
+      )}
 
       <TextInput
         style={styles.input}
@@ -91,6 +203,26 @@ const TelaEditarPerfil = ({ navigation }) => {
       <View style={styles.buttonContainer}>
         <CustomButton title="Salvar" onPress={saveChanges} />
       </View>
+
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text>Insira o link da imagem</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Cole o link da imagem"
+              value={imageUrl}
+              onChangeText={setImageUrl}
+            />
+            <Button title="Confirmar" onPress={handleLinkSubmit} />
+            <Button title="Cancelar" onPress={() => setModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -118,6 +250,11 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto",
     fontSize: 16,
   },
+  dateText: {
+    fontSize: 16,
+    paddingLeft: 15,
+    paddingTop: 14,
+  },
   profileImageContainer: {
     alignItems: "center",
     marginBottom: 20,
@@ -139,14 +276,22 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
   },
-  changeImageText: {
-    fontSize: 16,
-    color: "#007BFF",
-    textDecorationLine: "underline",
-  },
   buttonContainer: {
     alignItems: "center",
     marginTop: 20,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
   },
 });
 

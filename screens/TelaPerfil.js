@@ -1,38 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { launchImageLibrary } from "react-native-image-picker";
 import {
   View,
   Text,
   Image,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
-  Modal,
-  TextInput,
-  Button,
 } from "react-native";
 import CustomButton from "../src/components/CustomButton";
 import Supabase from "../src/SupabaseClient";
 
 const TelaPerfil = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
-  const [services, setServices] = useState([]);
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [imageUrl, setImageUrl] = useState("");
 
   const defaultImageUrl = "https://cdn.pixabay.com/photo/2024/06/01/14/00/ai-8802304_1280.jpg";
-
-  // Mocked User Data
-  const mockUserData = {
-    name: "Usuário Teste",
-    country: "Brasil",
-    region: "RS",
-    profileImageUrl: defaultImageUrl,
-    coverImageUrl: "https://example.com/default-cover.png",
-  };
 
   const mockServices = [
     {
@@ -57,6 +40,8 @@ const TelaPerfil = ({ navigation }) => {
       try {
         const { data: session, error: sessionError } = await Supabase.auth.getSession();
 
+        console.log(session)
+        
         if (sessionError) {
           setError("Erro ao obter sessão");
           return;
@@ -69,7 +54,7 @@ const TelaPerfil = ({ navigation }) => {
 
           const { data, error } = await Supabase
             .from("profiles")
-            .select("id, username, full_name, avatar_url, website")
+            .select("id, username, full_name, avatar_url")
             .eq("id", userId)
             .single();
 
@@ -92,46 +77,12 @@ const TelaPerfil = ({ navigation }) => {
     fetchUserData();
   }, []);
 
-  const saveImageUrl = async (url) => {
-    try {
-      const { data, error } = await Supabase
-        .from("profiles")
-        .update({ avatar_url: url })
-        .eq("id", userData.id);
-
-      if (error) {
-        console.log("Erro ao atualizar a imagem de perfil:", error.message);
-        setError("Erro ao atualizar imagem de perfil.");
-      } else {
-        console.log("Imagem de perfil atualizada com sucesso!");
-      }
-    } catch (err) {
-      console.log("Erro ao salvar a URL da imagem:", err);
-      setError("Erro ao salvar a URL da imagem.");
-    }
-  };
-
-  const openModal = () => {
-    setModalVisible(true);
-  };
-
-  const handleLinkSubmit = () => {
-    if (imageUrl) {
-      setProfileImage(imageUrl);
-      saveImageUrl(imageUrl); // Salva a URL do link no banco de dados
-      setModalVisible(false);
-      setImageUrl(""); // Limpa o campo
-    } else {
-      console.log("Link inválido");
-    }
-  };
-
   if (loading) {
     return <Text>Carregando...</Text>;
   }
 
   if (error) {
-    return <Text>{`Erro: ${error}`}</Text>;
+    return <Text>falha ao carregar dados do usuário</Text>;
   }
 
   return (
@@ -145,16 +96,15 @@ const TelaPerfil = ({ navigation }) => {
             />
           </View>
 
-          <TouchableOpacity onPress={openModal}>
-            <View style={styles.profileImageContainer}>
-              <Image
-                source={{
-                  uri: profileImage || defaultImageUrl,
-                }}
-                style={styles.profileImage}
-              />
-            </View>
-          </TouchableOpacity>
+          
+          <View style={styles.profileImageContainer}>
+            <Image
+              source={{
+                uri: profileImage || defaultImageUrl,
+              }}
+              style={styles.profileImage}
+            />
+          </View>
 
           <Text style={styles.userName}>{userData.username}</Text>
           <Text style={styles.location}>
@@ -187,26 +137,6 @@ const TelaPerfil = ({ navigation }) => {
           </View>
         ))}
       </ScrollView>
-
-      <Modal
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text>Insira o link da imagem</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Cole o link da imagem"
-              value={imageUrl}
-              onChangeText={setImageUrl}
-            />
-            <Button title="Confirmar" onPress={handleLinkSubmit} />
-            <Button title="Cancelar" onPress={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
     </ScrollView>
   );
 };
@@ -295,27 +225,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     textAlign: "center",
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: 300,
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 10,
-  },
+  }
 });
 
 export default TelaPerfil;
