@@ -1,39 +1,49 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 
 const TelaChatGeral = ({ navigation }) => {
   const servicos = [
     {
-      id: '1',
-      categoria: 'Pintor',
-      nomeProfissional: 'João',
-      detalhes: '5 Autônomos.\nPresencial.\nPintar somente uma parede.',
-      prazo: 'Até 22 de Fevereiro de 2022.',
+      id: "1",
+      categoria: "Pintor",
+      nomeProfissional: "João",
+      detalhes: "5 Autônomos.\nPresencial.\nPintar somente uma parede.",
+      prazo: "Até 22 de Fevereiro de 2022.",
     },
     {
-      id: '2',
-      categoria: 'Eletricista',
-      nomeProfissional: 'Fábio', 
-      detalhes: '5 Autônomos.\nPresencial.\nInstalar o lustre na sala.',
-      prazo: 'Até 22 de Fevereiro de 2022.',
+      id: "2",
+      categoria: "Eletricista",
+      nomeProfissional: "Fábio",
+      detalhes: "5 Autônomos.\nPresencial.\nInstalar o lustre na sala.",
+      prazo: "Até 22 de Fevereiro de 2022.",
     },
     {
-      id: '3',
-      categoria: 'Encanador',
-      nomeProfissional: 'Jorge', 
-      detalhes: '5 Autônomos.\nPresencial.\nInstalar a pia da cozinha.',
-      prazo: 'Até 22 de Fevereiro de 2022.',
+      id: "3",
+      categoria: "Encanador",
+      nomeProfissional: "Jorge",
+      detalhes: "5 Autônomos.\nPresencial.\nInstalar a pia da cozinha.",
+      prazo: "Até 22 de Fevereiro de 2022.",
     },
   ];
 
   const renderServico = ({ item }) => (
     <View style={styles.card}>
-      <Text style={styles.categoria}>{item.categoria} - {item.nomeProfissional}</Text>
+      <Text style={styles.categoria}>
+        {item.categoria} - {item.nomeProfissional}
+      </Text>
       <Text style={styles.detalhes}>{item.detalhes}</Text>
       <Text style={styles.prazo}>{item.prazo}</Text>
       <TouchableOpacity
         style={styles.botao}
-        onPress={() => navigation.navigate("TelaChatVendedor", { servico: item })}
+        onPress={() =>
+          navigation.navigate("TelaChatVendedor", { servico: item })
+        }
       >
         <Text style={styles.botaoTexto}>Falar com vendedor</Text>
       </TouchableOpacity>
@@ -43,7 +53,16 @@ const TelaChatGeral = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.voltar}>
+        {/* Botão de Voltar para a Tela Inicial */}
+        <TouchableOpacity
+          style={styles.voltar}
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "TelaInicial" }], // Redireciona para a tela inicial
+            })
+          }
+        >
           <Text style={styles.voltarTexto}>&larr;</Text>
         </TouchableOpacity>
         <Text style={styles.titulo}>Serviços Solicitados</Text>
@@ -61,59 +80,63 @@ const TelaChatGeral = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
-    position: 'relative',
+    position: "relative",
     paddingTop: 50,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
   },
   voltar: {
-    position: 'absolute',
+    position: "absolute",
     top: 70,
     left: 15,
   },
   voltarTexto: {
-    fontSize: 18,
-    color: '#333',
+    fontSize: 24, // Maior para facilitar o clique
+    color: "#333",
   },
   titulo: {
     fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginTop: 20,
   },
   card: {
     padding: 16,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     borderRadius: 8,
     marginHorizontal: 16,
+    marginBottom: 16,
   },
   categoria: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   detalhes: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 8,
   },
   prazo: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 16,
   },
   botao: {
-    backgroundColor: '#007bff',
-    paddingVertical: 10,
+    backgroundColor: "#007bff",
+    paddingVertical: 15, // Aumentado o padding para tornar o botão mais visível
+    paddingHorizontal: 30, // Aumentado o padding horizontal
     borderRadius: 4,
-    alignItems: 'center',
+    alignItems: "center",
+    width: "100%",
+    marginTop: 10,
   },
   botaoTexto: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
   },
   separator: {

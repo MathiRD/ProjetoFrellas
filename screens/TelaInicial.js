@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, Modal } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Modal,
+} from "react-native";
+import MapView, { Marker } from "react-native-maps";
 
 function TelaInicial({ navigation }) {
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -16,7 +25,7 @@ function TelaInicial({ navigation }) {
         "Manutenção básica, troca de óleo, troca de pastilhas de freio, filtro de oleo, e manutenções em geral",
       imageSource:
         "https://cocupo.com/wp-content/uploads/2016/05/que-es-un-mecanico.jpg",
-      category: "Manutenção"
+      category: "Manutenção",
     },
     {
       id: "2",
@@ -26,7 +35,7 @@ function TelaInicial({ navigation }) {
         "Serviço diarista para auxiliador de instalação elétrica residencial.",
       imageSource:
         "https://inpolpolimeros.com.br/wp-content/uploads/2023/04/contratar-eletricista-scaled.jpg",
-      category: "Dia a Dia"
+      category: "Dia a Dia",
     },
     {
       id: "3",
@@ -36,7 +45,7 @@ function TelaInicial({ navigation }) {
         "Serviço diarista para auxílio em instalação doméstica de banheiros no ED Vivenda",
       imageSource:
         "https://th.bing.com/th/id/R.6b7ce0e8a5dcf64078ca7db0c4f97e77?rik=vk6odBs898iVUQ&pid=ImgRaw&r=0",
-      category: "Dia a Dia"
+      category: "Dia a Dia",
     },
     {
       id: "4",
@@ -46,7 +55,7 @@ function TelaInicial({ navigation }) {
         "Prestação de suporte a formatação de computadores empresariais.",
       imageSource:
         "https://th.bing.com/th/id/OIP.x7wjoKkNsXxnwlM8JX5BhgHaE8?rs=1&pid=ImgDetMain",
-      category: "Informatica"
+      category: "Informatica",
     },
   ];
 
@@ -58,7 +67,7 @@ function TelaInicial({ navigation }) {
         "Pintura de paredes internas e externas. Serviço altamente recomendado pelos clientes.",
       imageSource:
         "https://guia.ar/wp-content/uploads/2021/02/servise-image-5.jpg",
-      category: "Dia a Dia"
+      category: "Dia a Dia",
     },
     {
       id: "2",
@@ -67,7 +76,7 @@ function TelaInicial({ navigation }) {
         "Diarista com montagens de móveis planejados. Com ótima reputação e atendendo diversas demandas.",
       imageSource:
         "https://www.lhmontagemdemoveis.com.br/wp-content/uploads/2019/11/Montador-De-M%C3%B3veis-EM-Salvador-BA.png",
-      category: "Mão de obra"
+      category: "Mão de obra",
     },
     {
       id: "3",
@@ -76,7 +85,7 @@ function TelaInicial({ navigation }) {
         "Diarista Doméstica. Empresa especializada há mais de 10 anos.",
       imageSource:
         "https://vejasp.abril.com.br/wp-content/uploads/2016/12/domestica_-divulgacao-desvia-3-1.jpeg?quality=70&strip=info&w=928",
-      category: "Dia a Dia"
+      category: "Dia a Dia",
     },
     {
       id: "4",
@@ -85,15 +94,23 @@ function TelaInicial({ navigation }) {
         "Manutenção de jardins, poda de árvores e plantas. Empresa destaque no ramo.",
       imageSource:
         "https://img.freepik.com/free-photo/smiling-afro-gardener-using-hedge-trimmer-cutting-bushes_651396-1479.jpg",
-      category: "Jardinagem"
+      category: "Jardinagem",
     },
   ];
 
-  const categories = ["Dia a Dia", "Informatica", "Mão de obra", "Jardinagem", "Manutenção"];
+  const categories = [
+    "Dia a Dia",
+    "Informatica",
+    "Mão de obra",
+    "Jardinagem",
+    "Manutenção",
+  ];
 
-  const filteredPopulares = mockPopulares.filter((popular) =>
-    (popular.title.toLowerCase().includes(searchText.toLowerCase()) || !searchText) &&
-    (popular.category === selectedCategory || !selectedCategory)
+  const filteredPopulares = mockPopulares.filter(
+    (popular) =>
+      (popular.title.toLowerCase().includes(searchText.toLowerCase()) ||
+        !searchText) &&
+      (popular.category === selectedCategory || !selectedCategory)
   );
 
   const openMapModal = () => {
@@ -105,7 +122,9 @@ function TelaInicial({ navigation }) {
   };
 
   const handleCategorySelect = (category) => {
-    setSelectedCategory((prevCategory) => (prevCategory === category ? null : category));
+    setSelectedCategory((prevCategory) =>
+      prevCategory === category ? null : category
+    );
   };
 
   return (
@@ -118,14 +137,14 @@ function TelaInicial({ navigation }) {
           <MapView
             style={styles.map}
             initialRegion={{
-              latitude: -28.2600,
+              latitude: -28.26,
               longitude: -52.4091,
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
             }}
           >
             <Marker
-              coordinate={{ latitude: -28.2600, longitude: -52.4091 }}
+              coordinate={{ latitude: -28.26, longitude: -52.4091 }}
               title="Passo Fundo"
               description="Cidade de Passo Fundo, Rio Grande do Sul"
             />
@@ -182,7 +201,9 @@ function TelaInicial({ navigation }) {
 
         <View style={styles.popularesContainer}>
           {filteredPopulares.length === 0 ? (
-            <Text style={styles.noItemsText}>Nenhum item encontrado para essa categoria.</Text>
+            <Text style={styles.noItemsText}>
+              Nenhum item encontrado para essa categoria.
+            </Text>
           ) : (
             <ScrollView style={styles.popularesCarousel}>
               {filteredPopulares.map((popular) => (
@@ -223,14 +244,14 @@ function TelaInicial({ navigation }) {
           <MapView
             style={styles.mapFullscreen}
             initialRegion={{
-              latitude: -28.2600,
+              latitude: -28.26,
               longitude: -52.4091,
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
             }}
           >
             <Marker
-              coordinate={{ latitude: -28.2600, longitude: -52.4091 }}
+              coordinate={{ latitude: -28.26, longitude: -52.4091 }}
               title="Passo Fundo"
               description="Cidade de Passo Fundo, Rio Grande do Sul"
             />
@@ -251,40 +272,45 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     height: 300,
-    backgroundColor: "#ccc",
+    backgroundColor: "#f4f4f4", // Alterei para um cinza mais claro
     justifyContent: "center",
     alignItems: "center",
+    borderRadius: 10, // Adicionei um borderRadius para suavizar os cantos
+    shadowColor: "#000", // Cor da sombra
+    shadowOffset: { width: 0, height: 5 }, // Aumentei o deslocamento da sombra
+    shadowOpacity: 0.2, // Aumentei a opacidade para uma sombra mais forte
+    shadowRadius: 10, // Aumentei o raio para uma sombra mais difusa
+    elevation: 10, // Para sombra no Android
   },
   map: {
     width: "100%",
     height: "100%",
-    borderRadius: 10,
-  },
-  mapText: {
-    position: "absolute",
-    color: "#fff",
-    fontSize: 16,
-    textAlign: "center",
-    top: 10,
+    borderRadius: 10, // Manter os cantos arredondados
   },
   sectionTitle: {
     fontSize: 22,
     fontWeight: "bold",
     marginVertical: 10,
     paddingHorizontal: 10,
+    color: "#333", // Cor do texto para contraste
   },
   servicesContainer: {
     flexDirection: "row",
     paddingHorizontal: 10,
   },
   card: {
-    backgroundColor: "#ccc",
-    borderRadius: 10,
+    backgroundColor: "#fff", // Fundo branco para destacar os cards
+    borderRadius: 15,
     margin: 5,
     width: 150,
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
+    shadowColor: "#000", // Adicionando sombra nos cards
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   cardImage: {
     width: 100,
@@ -295,6 +321,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     marginTop: 5,
+    color: "#007bff", // Cor de destaque para o título
   },
   cardStatus: {
     fontSize: 12,
@@ -306,7 +333,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     height: 40,
-    borderColor: "#ccc",
+    borderColor: "#ccc", // Cor de borda mais visível
     borderWidth: 1,
     borderRadius: 5,
     paddingLeft: 10,
@@ -316,14 +343,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   categoryItem: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#fff", // Antes estava #f0f0f0 (branco padrão)
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 15,
     marginRight: 10,
+    borderWidth: 1, // Adicionando uma borda para tornar mais visível o estado selecionado
+    borderColor: "#8c8c8c", // Cor de borda leve
   },
   selectedCategory: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#f0f0f0", // Mudando para cinza claro quando selecionado
   },
   categoryText: {
     fontSize: 16,
@@ -351,8 +380,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 15,
     padding: 10,
-    backgroundColor: "#ccc",
-    borderRadius: 25,
+    backgroundColor: "#fff", // Fundo branco para destaque
+    borderRadius: 15, // Tornando os cantos mais suaves
+    shadowColor: "#000", // Sombra visível
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   popularImage: {
     width: 80,
@@ -382,7 +416,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 20,
     right: 20,
-    backgroundColor: "#007bff",
+    backgroundColor: "#007bff", // Cor de destaque
     padding: 10,
     borderRadius: 5,
     zIndex: 10,
