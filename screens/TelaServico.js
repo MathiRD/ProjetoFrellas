@@ -1,132 +1,132 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   ScrollView,
+  Image,
+  TextInput,
   TouchableOpacity,
 } from "react-native";
-import CustomButton from "../src/components/CustomButton"; // Botão padrão do projeto
 
-const TelaServico = ({ route, navigation }) => {
-  // Dados mockados para o serviço (você pode substituir com os dados reais via props ou API)
-  const { serviceData } = route.params || {
-    serviceData: {
-      title: "Pintura de Casa",
-      price: "R$ 200",
-      paymentDate: "12/10/2024",
-      status: "Inativo",
-      sellerName: "Lucas Pintor",
-    },
+function TelaServico({ route, navigation }) {
+  const { service } = route.params;
+  const [contactMessage, setContactMessage] = useState("");
+
+  const handleContact = () => {
+    alert(`Mensagem enviada: ${contactMessage}`);
+    setContactMessage(""); // Limpar campo de mensagem
   };
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Imagem de fundo do serviço */}
-      <Image
-        source={{ uri: serviceData.backgroundImageUrl }}
-        style={styles.backgroundImage}
-      />
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        {/* Cabeçalho com imagem */}
+        <View style={styles.headerContainer}>
+          <Image
+            source={{ uri: service.imageSource }}
+            style={styles.headerImage}
+          />
+        </View>
 
-      {/* Imagem de perfil do vendedor */}
-      <View style={styles.profileContainer}>
-        <Image
-          source={{ uri: serviceData.profileImageUrl }}
-          style={styles.profileImage}
-        />
-      </View>
+        {/* Detalhes do Serviço */}
+        <View style={styles.detailsContainer}>
+          <Text style={styles.title}>{service.title}</Text>
+          <Text style={styles.status}>{service.status}</Text>
+          <Text style={styles.description}>{service.description}</Text>
+        </View>
 
-      {/* Detalhes do serviço */}
-      <View style={styles.detailsContainer}>
-        <Text style={styles.title}>{serviceData.title}</Text>
-        <Text style={styles.price}>{serviceData.price}</Text>
-        <Text style={styles.label}>
-          Pago em: <Text style={styles.value}>{serviceData.paymentDate}</Text>
-        </Text>
-        <Text style={styles.label}>
-          Status:{" "}
-          <Text
-            style={[
-              styles.value,
-              serviceData.status === "Ativo"
-                ? styles.activeStatus
-                : styles.inactiveStatus,
-            ]}
-          >
-            {serviceData.status}
-          </Text>
-        </Text>
-        <Text style={styles.label}>
-          Vendedor: <Text style={styles.value}>{serviceData.sellerName}</Text>
-        </Text>
-      </View>
-
-      {/* Botão para voltar */}
-      <CustomButton
-        title="Voltar"
-        onPress={() => navigation.goBack()}
-        style={styles.backButton}
-      />
-    </ScrollView>
+        {/* Seção de contato */}
+        <View style={styles.contactContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Deixe sua mensagem"
+            value={contactMessage}
+            onChangeText={setContactMessage}
+            multiline
+            numberOfLines={4}
+          />
+          <TouchableOpacity style={styles.button} onPress={handleContact}>
+            <Text style={styles.buttonText}>Enviar Mensagem</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF",
   },
-  backgroundImage: {
+  scrollView: {
+    flex: 1,
+  },
+  // Cabeçalho com a imagem do serviço
+  headerContainer: {
+    height: 250,
+    backgroundColor: "#F4F4F4",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  headerImage: {
     width: "100%",
-    height: 200,
+    height: "100%",
+    borderRadius: 10,
     resizeMode: "cover",
   },
-  profileContainer: {
-    alignItems: "center",
-    marginTop: -50, // Sobreposição da imagem de perfil na imagem de fundo
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: "#fff",
-  },
+  // Detalhes do serviço
   detailsContainer: {
     padding: 20,
+    backgroundColor: "#FFF",
   },
   title: {
-    fontSize: 24,
+    fontSize: 26, // Tamanho maior para título
     fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  price: {
-    fontSize: 20,
-    color: "green",
-    fontWeight: "bold",
-    textAlign: "center",
+    color: "#333", // Cor escura
     marginBottom: 10,
   },
-  label: {
+  status: {
+    fontSize: 18,
+    color: "#28a745", // Cor verde para status "Aberto"
+    marginBottom: 10,
+  },
+  description: {
     fontSize: 16,
-    fontWeight: "600",
-    marginVertical: 5,
+    color: "#555", // Cor mais suave para a descrição
+    lineHeight: 22,
+    marginBottom: 20,
   },
-  value: {
-    fontWeight: "400",
+  // Contato: Caixa de mensagem e botão
+  contactContainer: {
+    padding: 20,
+    backgroundColor: "#F9F9F9",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  input: {
+    height: 120,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingLeft: 10,
+    paddingTop: 10,
+    textAlignVertical: "top",
     fontSize: 16,
+    color: "#333",
+    marginBottom: 20,
   },
-  activeStatus: {
-    color: "green",
+  button: {
+    backgroundColor: "#1e90ff", // Cor azul do botão
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: "center",
   },
-  inactiveStatus: {
-    color: "red",
-  },
-  backButton: {
-    marginTop: 20,
-    alignSelf: "center",
+  buttonText: {
+    fontSize: 18, // Tamanho de fonte maior
+    color: "#FFF",
+    fontWeight: "bold",
   },
 });
 
