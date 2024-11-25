@@ -4,7 +4,7 @@ import { useRoute } from '@react-navigation/native';
 
 const TelaChatVendedor = () => {
   const route = useRoute();
-  const { servico } = route.params || {}; // Garante que route.params sempre exista
+  const { servico } = route.params || {};
 
   const [mensagens, setMensagens] = useState([
     { id: '1', texto: `Olá, estou interessado em ${servico?.categoria || 'seu serviço'}.`, enviadoPorUsuario: true },
@@ -35,15 +35,15 @@ const TelaChatVendedor = () => {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
-      {/* Cabeçalho */}
       <View style={styles.header}>
         <TouchableOpacity>
           <Text style={styles.voltar}>&larr;</Text>
         </TouchableOpacity>
-        <Text style={styles.nomeProfissional}>{servico?.categoria || 'Serviço'}</Text>
+        <Text style={styles.nomeProfissional}>
+          {servico?.nomeProfissional || 'Profissional'} - {servico?.categoria || 'Serviço'} {/* Exibindo nome e categoria */}
+        </Text>
       </View>
 
-      {/* Lista de mensagens */}
       <FlatList
         data={mensagens}
         keyExtractor={(item) => item.id}
@@ -51,7 +51,6 @@ const TelaChatVendedor = () => {
         contentContainerStyle={styles.listaMensagens}
       />
 
-      {/* Campo de entrada de texto */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
