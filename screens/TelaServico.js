@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
+import CustomButton from "../src/components/CustomButton";
 
 function TelaServico({ route, navigation }) {
   const { service } = route.params;
@@ -16,7 +17,10 @@ function TelaServico({ route, navigation }) {
       <ScrollView>
         {/* Header com imagem de fundo */}
         <View style={styles.headerContainer}>
-          <Image source={{ uri: service.imageSource }} style={styles.headerImage} />
+          <Image
+            source={{ uri: service.imageSource }}
+            style={styles.headerImage}
+          />
           <View style={styles.headerOverlay} />
           <View style={styles.overlayContent}>
             <Text style={styles.headerTitle}>{service.title}</Text>
@@ -26,7 +30,9 @@ function TelaServico({ route, navigation }) {
             </View>
             <View style={styles.headerStats}>
               <Text style={styles.stat}>⭐ +100 Serviços feitos</Text>
-              <Text style={styles.stat}>⭐ {service.experience} Anos no mercado</Text>
+              <Text style={styles.stat}>
+                ⭐ {service.experience} Anos no mercado
+              </Text>
             </View>
           </View>
         </View>
@@ -39,7 +45,10 @@ function TelaServico({ route, navigation }) {
 
         {/* Perfil */}
         <View style={styles.profileContainer}>
-          <Image source={{ uri: service.profileImage }} style={styles.profileImage} />
+          <Image
+            source={{ uri: service.profileImage }}
+            style={styles.profileImage}
+          />
           <View style={styles.profileDetails}>
             <Text style={styles.profileName}>{service.professionalName}</Text>
             <Text style={styles.profileRole}>{service.professionalRole}</Text>
@@ -60,7 +69,9 @@ function TelaServico({ route, navigation }) {
           <ScrollView horizontal>
             {[...Array(5)].map((_, index) => (
               <View key={index} style={styles.galleryPlaceholder}>
-                <Text style={styles.galleryPlaceholderText}>Imagem {index + 1}</Text>
+                <Text style={styles.galleryPlaceholderText}>
+                  Imagem {index + 1}
+                </Text>
               </View>
             ))}
           </ScrollView>
@@ -68,17 +79,21 @@ function TelaServico({ route, navigation }) {
 
         {/* Mapa */}
         <View style={styles.mapPlaceholder}>
-          <Text style={styles.mapPlaceholderText}>Mapa será integrado aqui</Text>
+          <Text style={styles.mapPlaceholderText}>
+            Mapa será integrado aqui
+          </Text>
         </View>
 
         {/* Footer */}
         <View style={styles.footerContainer}>
           <Text style={styles.price}>
-            Preço estimado: <Text style={styles.priceValue}>R$: {service.priceRange}</Text>
+            Preço estimado:{" "}
+            <Text style={styles.priceValue}>R$: {service.priceRange}</Text>
           </Text>
-          <TouchableOpacity style={styles.actionButton}>
-            <Text style={styles.actionButtonText}>Contratar agora</Text>
-          </TouchableOpacity>
+          <CustomButton
+            title="Contratar agora"
+            onPress={() => alert("Contratação realizada com sucesso!")} // Personalize a ação aqui
+          />
         </View>
       </ScrollView>
     </View>
@@ -218,17 +233,6 @@ const styles = StyleSheet.create({
   priceValue: {
     fontWeight: "bold",
     fontSize: 18,
-  },
-  actionButton: {
-    backgroundColor: "#1e90ff",
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 10,
-  },
-  actionButtonText: {
-    fontSize: 18,
-    color: "#FFF",
-    fontWeight: "bold",
   },
 });
 

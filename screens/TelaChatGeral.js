@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
+import CustomButton from "../src/components/CustomButton";
 
 const TelaChatGeral = ({ navigation }) => {
   const servicos = [
@@ -39,14 +40,13 @@ const TelaChatGeral = ({ navigation }) => {
       </Text>
       <Text style={styles.detalhes}>{item.detalhes}</Text>
       <Text style={styles.prazo}>{item.prazo}</Text>
-      <TouchableOpacity
-        style={styles.botao}
+      <CustomButton
+        title="Falar com vendedor"
         onPress={() =>
           navigation.navigate("TelaChatVendedor", { servico: item })
         }
-      >
-        <Text style={styles.botaoTexto}>Falar com vendedor</Text>
-      </TouchableOpacity>
+        style={styles.botao} // Adicione estilos personalizados, se necessário
+      />
     </View>
   );
 
@@ -56,7 +56,7 @@ const TelaChatGeral = ({ navigation }) => {
         <TouchableOpacity
           style={styles.voltar}
           onPress={() => navigation.navigate("Início")}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // Área adicional clicável
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Text style={styles.voltarTexto}>&larr;</Text>
         </TouchableOpacity>
@@ -67,6 +67,7 @@ const TelaChatGeral = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         renderItem={renderServico}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ListHeaderComponent={<View style={{ height: 16 }} />} // Espaçamento acima do primeiro card
       />
     </View>
   );
@@ -83,16 +84,16 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     borderBottomWidth: 1,
     borderColor: "#ddd",
-    alignItems: "center", // Centraliza o título
+    alignItems: "center",
   },
   voltar: {
     position: "absolute",
     top: 50,
     left: 15,
-    padding: 10, // Aumenta a área visível ao redor do texto
+    padding: 10,
   },
   voltarTexto: {
-    fontSize: 24, // Maior para facilitar o clique
+    fontSize: 24,
     color: "#333",
   },
   titulo: {
@@ -107,12 +108,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 16,
     marginBottom: 16,
-    // Adicionando o efeito de box-shadow
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5, // Necessário para Android
+    elevation: 5,
   },
   categoria: {
     fontSize: 18,
@@ -128,19 +128,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     marginBottom: 16,
-  },
-  botao: {
-    backgroundColor: "#007bff",
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 4,
-    alignItems: "center",
-    width: "100%",
-    marginTop: 10,
-  },
-  botaoTexto: {
-    color: "#fff",
-    fontSize: 16,
   },
   separator: {
     height: 16,
