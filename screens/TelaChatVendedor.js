@@ -40,7 +40,7 @@ const TelaChatVendedor = () => {
           <Text style={styles.voltar}>&larr;</Text>
         </TouchableOpacity>
         <Text style={styles.nomeProfissional}>
-          {servico?.nomeProfissional || 'Profissional'} - {servico?.categoria || 'Serviço'} {/* Exibindo nome e categoria */}
+          {servico?.nomeProfissional || 'Profissional'} - {servico?.categoria || 'Serviço'} {}
         </Text>
       </View>
 
