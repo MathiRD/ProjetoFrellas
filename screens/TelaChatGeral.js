@@ -1,74 +1,142 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator, // Importando o indicador de carregamento
 } from "react-native";
 import CustomButton from "../src/components/CustomButton";
+import Supabase from "../src/SupabaseClient";
 
 const TelaChatGeral = ({ navigation }) => {
-  const servicos = [
-    {
-      id: "1",
-      categoria: "Pintor",
-      nomeProfissional: "João",
-      detalhes: "5 Autônomos.\nPresencial.\nPintar somente uma parede.",
-      prazo: "Até 22 de Fevereiro de 2022.",
-    },
-    {
-      id: "2",
-      categoria: "Eletricista",
-      nomeProfissional: "Fábio",
-      detalhes: "5 Autônomos.\nPresencial.\nInstalar o lustre na sala.",
-      prazo: "Até 22 de Fevereiro de 2022.",
-    },
-    {
-      id: "3",
-      categoria: "Encanador",
-      nomeProfissional: "Jorge",
-      detalhes: "5 Autônomos.\nPresencial.\nInstalar a pia da cozinha.",
-      prazo: "Até 22 de Fevereiro de 2022.",
-    },
-  ];
+  const [chats, setChats] = useState([]);
+  const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(true); // Estado para controle de carregamento
+  const [error, setError] = useState(null); // Estado para mensagens de erro
+
+  useEffect(() => {
+    fetchUserSession();
+  }, []);
+
+  const formatCategory = (categoryValue) => {
+    const categories = {
+      dia_a_dia: "Dia a dia",
+      manutencao: "Manutenção",
+      tecnologia: "Tecnologia",
+      mao_de_obra: "Mão de obra",
+      jardinagem: "Jardinagem",
+    };
+  
+    return categories[categoryValue] || categoryValue; // Retorna o valor formatado ou o valor original caso não exista no mapeamento
+  };
+
+  const fetchUserSession = async () => {
+    try {
+      const { data: session, error: sessionError } = await Supabase.auth.getSession();
+      if (sessionError) throw new Error("Erro ao obter sessão");
+      const user = session?.session?.user;
+      if (!user) throw new Error("Usuário não encontrado");
+      setUserId(user.id);
+      fetchChats(user.id);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  const fetchChats = async (userId) => {
+    if (!userId) return;
+    try {
+      const { data, error } = await Supabase
+        .from("chats")
+        .select("id, id_servico, id_usuario_dono, id_usuario_cliente")
+        .or(`id_usuario_dono.eq.${userId},id_usuario_cliente.eq.${userId}`); // Buscando chats relacionados ao usuário
+  
+      if (error) throw error;
+  
+      const chatDetails = await Promise.all(
+        data.map(async (chat) => {
+          const { data: serviceData, error: serviceError } = await Supabase
+            .from("services")
+            .select("title, category, id_usuario")
+            .eq("id", chat.id_servico)
+            .single();
+  
+          if (serviceError) throw serviceError;
+  
+          return {
+            ...chat,
+            service: serviceData,
+          };
+        })
+      );
+  
+      setChats(chatDetails);
+      setLoading(false); // Dados carregados, podemos parar o carregamento
+    } catch (err) {
+      setError("Erro ao carregar os chats.");
+      setLoading(false); // Caso haja erro, paramos o carregamento
+    }
+  };
 
   const renderServico = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.categoria}>
-        {item.categoria} - {item.nomeProfissional}
+        {formatCategory(item.service.category)} - {item.service.title}
       </Text>
-      <Text style={styles.detalhes}>{item.detalhes}</Text>
-      <Text style={styles.prazo}>{item.prazo}</Text>
+      <Text style={styles.detalhes}>
+        Vendedor: {item.service.id_usuario === userId ? "Você" : "Outro"}
+      </Text>
       <CustomButton
-        title="Falar com vendedor"
+        title={item.service.id_usuario === userId ? "Falar com o cliente" : "Falar com vendedor"}
         onPress={() =>
-          navigation.navigate("TelaChatVendedor", { servico: item })
+          navigation.navigate("TelaChatVendedor", { servico: item.service, idChat: item.id })
         }
-        style={styles.botao} // Adicione estilos personalizados, se necessário
+        style={styles.botao}
       />
     </View>
   );
+
+  const renderContent = () => {
+    if (loading) {
+      return <ActivityIndicator size="large" color="#0000ff" style={styles.loading} />;
+    }
+
+    if (error) {
+      return <Text style={styles.errorText}>{error}</Text>;
+    }
+
+    if (chats.length === 0) {
+      return <Text style={styles.errorText}>Nenhum chat encontrado.</Text>;
+    }
+
+    return (
+      <FlatList
+        data={chats}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderServico}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ListHeaderComponent={<View style={{ height: 16 }} />}
+      />
+    );
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.voltar}
-          onPress={() => navigation.navigate("Início")}
+          onPress={() => navigation.navigate("TelaChatVendedor")}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Text style={styles.voltarTexto}>&larr;</Text>
         </TouchableOpacity>
         <Text style={styles.titulo}>Serviços Solicitados</Text>
       </View>
-      <FlatList
-        data={servicos}
-        keyExtractor={(item) => item.id}
-        renderItem={renderServico}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        ListHeaderComponent={<View style={{ height: 16 }} />} // Espaçamento acima do primeiro card
-      />
+      {renderContent()}
     </View>
   );
 };
@@ -124,13 +192,20 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 8,
   },
-  prazo: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 16,
-  },
   separator: {
     height: 16,
+  },
+  botao: {
+    marginTop: 10,
+  },
+  loading: {
+    marginTop: 20,
+  },
+  errorText: {
+    textAlign: "center",
+    color: "red",
+    fontSize: 16,
+    marginTop: 20,
   },
 });
 

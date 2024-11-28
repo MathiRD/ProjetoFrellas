@@ -16,6 +16,9 @@ import MapView, { Marker } from "react-native-maps";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Supabase from "../src/SupabaseClient";
 import 'react-native-get-random-values';
+import { GOOGLE_MAPS_KEY } from '@env';
+console.log(GOOGLE_MAPS_KEY);
+
 
 const TelaAdicionarServico = ({ navigation }) => {
   const [title, setTitle] = useState("");
@@ -197,7 +200,7 @@ const TelaAdicionarServico = ({ navigation }) => {
               }}
               fetchDetails
               query={{
-                key: "AIzaSyDKy-9pgFnme2fBWP63ebe8Y2AnD3_fQM4",
+                key: GOOGLE_MAPS_KEY,
                 language: "pt-BR",
               }}
               styles={{

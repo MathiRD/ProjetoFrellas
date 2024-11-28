@@ -1,65 +1,46 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, FlatList, TextInput } from "react-native";
-import { TabView, SceneMap, TabBar } from "react-native-tab-view";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TextInput,
+  Modal,
+  TouchableOpacity,
+  Button,
+} from "react-native";
+import { TabView, TabBar } from "react-native-tab-view";
 import { useWindowDimensions } from "react-native";
+import Supabase from "../src/SupabaseClient";
 
-const pagamentosIniciais = {
-  pagos: [
-    {
-      id: "1",
-      titulo: "Pintura de uma parede",
-      valor: "169",
-      data: "05/10/2024",
-      status: "Pago",
-      profissional: "Pintor - João",
-    },
-    {
-      id: "2",
-      titulo: "Instalação do lustre na sala",
-      valor: "300",
-      data: "10/10/2024",
-      status: "Pago",
-      profissional: "Eletricista - Fábio",
-    },
-    {
-      id: "3",
-      titulo: "Instalação da pia da cozinha",
-      valor: "400",
-      data: "15/10/2024",
-      status: "Pago",
-      profissional: "Encanador - Jorge",
-    },
-  ],
-  pendentes: [
-    {
-      id: "1",
-      titulo: "Cortar a grama",
-      valor: "50",
-      data: "02/12/2024",
-      status: "Pendente",
-      profissional: "Jardineiro - Paulo",
-    },
-    {
-      id: "2",
-      titulo: "Limpeza completo no apto",
-      valor: "469",
-      data: "04/12/2024",
-      status: "Pendente",
-      profissional: "Doméstica - Jaqueline",
-    },
-    {
-      id: "3",
-      titulo: "Formatar 3 computadores",
-      valor: "250",
-      data: "30/11/2024",
-      status: "Pendente",
-      profissional: "Técnico TI - Rômulo",
-    },
-  ],
+const fetchPagamentos = async (userId) => {
+  const { data, error } = await Supabase
+    .from("financas")
+    .select("*")
+    .order("data_criacao", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return { pagos: [], pendentes: [], cobrancas: [] };
+  }
+
+  const pagos = data.filter(
+    (item) => item.status === "Pago" && item.id_usuario !== userId
+  );
+  const pendentes = data.filter(
+    (item) => item.status !== "Pago" && item.id_usuario !== userId
+  );
+  const cobrancas = data.filter((item) => item.id_usuario === userId);
+
+  return { pagos, pendentes, cobrancas };
 };
 
-const CardPagamento = ({ titulo, valor, data, status, profissional }) => (
-  <View style={styles.card}>
+const CardPagamento = ({ titulo, valor, data, status, onPress }) => (
+  <TouchableOpacity
+    style={styles.card}
+    onPress={onPress || (() => {})}
+    disabled={!onPress}
+  >
     <View style={styles.cardHeader}>
       <Text style={styles.cardTitle}>{titulo}</Text>
       <Text
@@ -72,42 +53,22 @@ const CardPagamento = ({ titulo, valor, data, status, profissional }) => (
       </Text>
     </View>
     <Text style={styles.cardDate}>
-      {status === "Pago" ? "Pago em:" : "Vencimento:"} {data}
+      Gerado em: {data}
     </Text>
-    <View style={styles.cardFooter}>
-      <Text style={styles.cardUser}>{profissional}</Text>
-      <Text style={styles.cardStatus}>Inativo</Text>
-    </View>
-  </View>
+  </TouchableOpacity>
 );
 
-const PagosTab = ({ pagamentos }) => (
+const CobrancasTab = ({ pagamentos, onCardPress }) => (
   <FlatList
     data={pagamentos}
-    keyExtractor={(item) => item.id}
+    keyExtractor={(item) => item.id.toString()}
     renderItem={({ item }) => (
       <CardPagamento
-        titulo={item.titulo}
-        valor={item.valor}
-        data={item.data}
-        status="Pago"
-        profissional={item.profissional}
-      />
-    )}
-  />
-);
-
-const PendentesTab = ({ pagamentos }) => (
-  <FlatList
-    data={pagamentos}
-    keyExtractor={(item) => item.id}
-    renderItem={({ item }) => (
-      <CardPagamento
-        titulo={item.titulo}
-        valor={item.valor}
-        data={item.data}
-        status="Pendente"
-        profissional={item.profissional}
+        titulo={item.descricao}
+        valor={item.valor.toFixed(2)}
+        data={new Date(item.data_criacao).toLocaleDateString()}
+        status={item.status}
+        onPress={onCardPress ? () => onCardPress(item) : null}
       />
     )}
   />
@@ -119,32 +80,118 @@ const TelaFinanceiro = () => {
   const [routes] = useState([
     { key: "pagos", title: "Pagos" },
     { key: "pendentes", title: "Pendências" },
+    { key: "cobrancas", title: "Cobranças" },
   ]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [pagamentos, setPagamentos] = useState(pagamentosIniciais);
+  const [pagamentos, setPagamentos] = useState({
+    pagos: [],
+    pendentes: [],
+    cobrancas: [],
+  });
+  const [filteredPagamentos, setFilteredPagamentos] = useState({
+    pagos: [],
+    pendentes: [],
+    cobrancas: [],
+  });
+  const [userId, setUserId] = useState(null);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    fetchUserSession();
+  }, []);
+
+  const fetchUserSession = async () => {
+    try {
+      const { data: session, error: sessionError } = await Supabase.auth.getSession();
+      if (sessionError) throw new Error("Erro ao obter sessão");
+      const user = session?.session?.user;
+      if (!user) throw new Error("Usuário não encontrado");
+      setUserId(user.id);
+      loadPagamentos(user.id);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const loadPagamentos = async (userId) => {
+    if (!userId) return;
+    const dados = await fetchPagamentos(userId);
+    setPagamentos(dados);
+    setFilteredPagamentos(dados);
+  };
 
   const handleSearch = (query) => {
     setSearchQuery(query);
 
-    const filteredPagos = pagamentosIniciais.pagos.filter((item) =>
-      item.titulo.toLowerCase().includes(query.toLowerCase())
+    if (query.trim() === "") {
+      setFilteredPagamentos(pagamentos);
+      return;
+    }
+
+    const filteredPagos = pagamentos.pagos.filter((item) =>
+      item.descricao.toLowerCase().includes(query.toLowerCase())
     );
-    const filteredPendentes = pagamentosIniciais.pendentes.filter((item) =>
-      item.titulo.toLowerCase().includes(query.toLowerCase())
+    const filteredPendentes = pagamentos.pendentes.filter((item) =>
+      item.descricao.toLowerCase().includes(query.toLowerCase())
+    );
+    const filteredCobrancas = pagamentos.cobrancas.filter((item) =>
+      item.descricao.toLowerCase().includes(query.toLowerCase())
     );
 
-    setPagamentos({
+    setFilteredPagamentos({
       pagos: filteredPagos,
       pendentes: filteredPendentes,
+      cobrancas: filteredCobrancas,
     });
   };
 
+  const handleCardPress = (card) => {
+    setSelectedCard({ ...card, originalStatus: card.status });
+    setModalVisible(true);
+  };
+
+  const handleStatusChange = async () => {
+    try {
+      const novoStatus = selectedCard.status === "Pago" ? "Pendente" : "Pago";
+  
+      const { error } = await Supabase
+        .from("financas")
+        .update({ status: novoStatus })
+        .eq("id", selectedCard.id);
+  
+      if (error) throw error;
+  
+      loadPagamentos(userId);
+      setModalVisible(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
   const renderScene = ({ route }) => {
     switch (route.key) {
       case "pagos":
-        return <PagosTab pagamentos={pagamentos.pagos} />;
+        return (
+          <CobrancasTab
+            pagamentos={filteredPagamentos.pagos}
+            onCardPress={null}
+          />
+        );
       case "pendentes":
-        return <PendentesTab pagamentos={pagamentos.pendentes} />;
+        return (
+          <CobrancasTab
+            pagamentos={filteredPagamentos.pendentes}
+            onCardPress={null}
+          />
+        );
+      case "cobrancas":
+        return (
+          <CobrancasTab
+            pagamentos={filteredPagamentos.cobrancas}
+            onCardPress={handleCardPress}
+          />
+        );
       default:
         return null;
     }
@@ -176,6 +223,19 @@ const TelaFinanceiro = () => {
           />
         )}
       />
+      <Modal visible={modalVisible} transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{selectedCard?.descricao}</Text>
+            <Text>Valor: R$ {selectedCard?.valor.toFixed(2)}</Text>
+            <Button
+              title={selectedCard?.status === "Pago" ? "Reverter para Pendente" : "Marcar como Pago"}
+              onPress={handleStatusChange}
+            />
+            <Button title="Fechar" onPress={() => setModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -262,5 +322,24 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 14,
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: 300,
+    backgroundColor: "#FFF",
+    borderRadius: 8,
+    padding: 16,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
 });
+
 export default TelaFinanceiro;
