@@ -8,12 +8,12 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import CustomButton from "../src/components/CustomButton";
 import Supabase from "../src/SupabaseClient";
+import { GOOGLE_MAPS_KEY } from '@env';
 
 const TelaEditarServico = ({ navigation, route }) => {
   const { service } = route.params;
@@ -154,7 +154,7 @@ const TelaEditarServico = ({ navigation, route }) => {
           }}
           fetchDetails
           query={{
-            key: "AIzaSyDKy-9pgFnme2fBWP63ebe8Y2AnD3_fQM4",
+            key: GOOGLE_MAPS_KEY,
             language: "pt-BR",
           }}
           styles={{

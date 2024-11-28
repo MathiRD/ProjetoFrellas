@@ -18,54 +18,9 @@ function TelaInicial({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [populares, setPopulares] = useState([]);
+  const [destaque, setDestaque] = useState([]);
+  const [markers, setMarkers] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const mockCards = [
-    {
-      id: '1',
-      title: 'Mecânico',
-      status: 'Aberto',
-      description:
-        'Manutenção básica, troca de óleo, troca de pastilhas de freio, filtro de oleo, e manutenções em geral',
-      service_img:
-        'https://cocupo.com/wp-content/uploads/2016/05/que-es-un-mecanico.jpg',
-      category: 'Manutenção',
-      priceRange: 200,
-    },
-    {
-      id: '2',
-      title: 'Eletricista',
-      status: 'Aberto',
-      description:
-        'Serviço diarista para auxiliador de instalação elétrica residencial.',
-      service_img:
-        'https://inpolpolimeros.com.br/wp-content/uploads/2023/04/contratar-eletricista-scaled.jpg',
-      category: 'Dia a Dia',
-      priceRange: 500,
-    },
-    {
-      id: '3',
-      title: 'Encanador',
-      status: 'Aberto',
-      description:
-        'Serviço diarista para auxílio em instalação doméstica de banheiros no ED Vivenda',
-      service_img:
-        'https://th.bing.com/th/id/R.6b7ce0e8a5dcf64078ca7db0c4f97e77?rik=vk6odBs898iVUQ&pid=ImgRaw&r=0',
-      category: 'Dia a Dia',
-      priceRange: 150,
-    },
-    {
-      id: '4',
-      title: 'Técnico TI',
-      status: 'Aberto',
-      description:
-        'Prestação de suporte a formatação de computadores empresariais.',
-      service_img:
-        'https://th.bing.com/th/id/OIP.x7wjoKkNsXxnwlM8JX5BhgHaE8?rs=1&pid=ImgDetMain',
-      category: 'Informatica',
-      priceRange: 400,
-    },
-  ];
 
   const categories = [
     { label: 'Dia a Dia', value: 'dia_a_dia' },
@@ -86,6 +41,39 @@ function TelaInicial({ navigation }) {
         console.error('Erro ao buscar serviços populares:', error);
       } else {
         setPopulares(data);
+
+        const extractedMarkers = data
+          .filter((item) => item.coordenades)
+          .map((item) => ({
+            id: item.id,
+            title: item.title,
+            description: item.description,
+            coordinates: {
+              latitude: item.coordenades[0],
+              longitude: item.coordenades[1],
+            },
+          }));
+        setMarkers(extractedMarkers);
+      }
+    } catch (err) {
+      console.error('Erro inesperado:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDestaque = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await Supabase.from('services')
+        .select('*')
+        .eq('great_service', true)
+        .order('title', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao buscar serviços em destaque:', error);
+      } else {
+        setDestaque(data);
       }
     } catch (err) {
       console.error('Erro inesperado:', err);
@@ -97,6 +85,7 @@ function TelaInicial({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       fetchPopulares();
+      fetchDestaque();
     }, [])
   );
 
@@ -137,22 +126,33 @@ function TelaInicial({ navigation }) {
               longitudeDelta: 0.0421,
             }}
           >
-            <Marker
-              coordinate={{ latitude: -28.26, longitude: -52.4091 }}
-              title="Passo Fundo"
-              description="Cidade de Passo Fundo, Rio Grande do Sul"
-            />
+            {markers.map((marker) => (
+              <Marker
+                key={marker.id}
+                coordinate={marker.coordinates}
+                title={marker.title}
+                description={marker.description}
+              />
+            ))}
           </MapView>
         </TouchableOpacity>
 
         <Text style={styles.sectionTitle}>Serviços em Destaque</Text>
         <ScrollView horizontal style={styles.servicesContainer}>
-          {mockCards.map((card) => (
+          {destaque.map((card) => (
             <TouchableOpacity
               key={card.id}
-              onPress={() =>
-                navigation.navigate("TelaServico", { service: card })
-              }
+              onPress={() => {
+                const galleryImages = card.img_galery && card.img_galery.length > 0 && card.img_galery[0] !== "" 
+                  ? card.img_galery 
+                  : [];
+                navigation.navigate("TelaServico", {
+                  service: card,
+                  coordinates: card.coordenades,
+                  price: card.price,
+                  galleryImages: galleryImages,
+                });
+              }}
               style={styles.card}
             >
               <Image
@@ -160,6 +160,7 @@ function TelaInicial({ navigation }) {
                 style={styles.cardImage}
               />
               <Text style={styles.cardTitle}>{card.title}</Text>
+              <Text>{card.description}</Text>
               <Text style={styles.cardStatus}>{card.status}</Text>
             </TouchableOpacity>
           ))}
@@ -205,9 +206,17 @@ function TelaInicial({ navigation }) {
               {filteredPopulares.map((popular) => (
                 <TouchableOpacity
                   key={popular.id}
-                  onPress={() =>
-                    navigation.navigate("TelaServico", { service: popular })
-                  }
+                  onPress={() => {
+                    const galleryImages = popular.img_galery && popular.img_galery.length > 0 && popular.img_galery[0] !== "" 
+                      ? popular.img_galery 
+                      : [];
+                    navigation.navigate("TelaServico", {
+                      service: popular,
+                      coordinates: popular.coordenades,
+                      price: popular.price,
+                      galleryImages: galleryImages,
+                    });
+                  }}
                   style={styles.popularCard}
                 >
                   <Image
@@ -246,11 +255,14 @@ function TelaInicial({ navigation }) {
               longitudeDelta: 0.0421,
             }}
           >
-            <Marker
-              coordinate={{ latitude: -28.26, longitude: -52.4091 }}
-              title="Passo Fundo"
-              description="Cidade de Passo Fundo, Rio Grande do Sul"
-            />
+            {markers.map((marker) => (
+              <Marker
+                key={marker.id}
+                coordinate={marker.coordinates}
+                title={marker.title}
+                description={marker.description}
+              />
+            ))}
           </MapView>
         </View>
       </Modal>
