@@ -20,11 +20,11 @@ Para Vendedores:
 🚀 Tecnologias Utilizadas
 
     Frontend: React Native
-    Backend: Node.js com Express
-    Banco de Dados: Supabase
+    Backend: Todo o consumo de dados de manutenção foi realizado com supabase
+    Banco de Dados: postgresql (supabase)
     Autenticação: Supabase Auth
     Geolocalização: API do Google Maps
-    Comunicação em Tempo Real: WebSocket (para chat em tempo real)
+    Comunicação em Tempo Real: Tabelas com realTime do supabase
     Gerenciamento de Estado: Context API (ou Redux)
 
 🌐 APIs do Google Cloud Utilizadas
@@ -89,8 +89,6 @@ GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 Inicie o servidor:
 
 npm start
-# ou
-yarn start
 
 Inicie o app mobile:
 
