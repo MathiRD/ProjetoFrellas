@@ -125,10 +125,12 @@ Observações:
     Supabase: O projeto utiliza Supabase para gerenciamento de banco de dados e autenticação. A configuração do Supabase é necessária para rodar o projeto.
     API do Google Maps: A funcionalidade de mapeamento de profissionais requer a integração com a API do Google Maps. Certifique-se de configurar uma chave de API do Google Maps.
 
-Scripts de Banco de Dados para o supabase
+ Scripts de Banco de Dados para o Supabase
 
-Para configurar o ambiente de banco de dados necessário para o projeto, siga os scripts SQL abaixo. Certifique-se de executar cada script na ordem, para evitar problemas com dependências entre tabelas.
-Tabela: profiles
+Para configurar o ambiente de banco de dados necessário para o projeto, siga os scripts SQL abaixo. Certifique-se de executar cada script na ordem correta para evitar problemas com dependências entre as tabelas. Além disso, habilite as permissões de autenticação e interação entre as tabelas.
+1. Tabela: profiles
+
+Crie a tabela de perfis de usuários:
 
 CREATE TABLE profiles (
     id UUID PRIMARY KEY,
@@ -143,7 +145,9 @@ CREATE TABLE profiles (
     banner_url TEXT
 );
 
-Tabela: services
+2. Tabela: services
+
+Crie a tabela de serviços oferecidos pelos vendedores:
 
 CREATE TABLE services (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -161,7 +165,9 @@ CREATE TABLE services (
     great_service BOOLEAN DEFAULT FALSE
 );
 
-Tabela: chats
+3. Tabela: chats
+
+Crie a tabela de chats para registrar as conversas entre os clientes e vendedores:
 
 CREATE TABLE chats (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -170,7 +176,9 @@ CREATE TABLE chats (
     id_usuario_cliente UUID REFERENCES profiles (id) ON DELETE CASCADE
 );
 
-Tabela: financas
+4. Tabela: financas
+
+Crie a tabela de finanças, que mantém o controle dos pagamentos:
 
 CREATE TABLE financas (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -183,7 +191,9 @@ CREATE TABLE financas (
     status TEXT NOT NULL
 );
 
-Tabela: mensagens (Com Realtime Ativado)
+5. Tabela: mensagens (Com Realtime Ativado)
+
+Crie a tabela de mensagens, com suporte para tempo real:
 
 CREATE TABLE mensagens (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -195,9 +205,10 @@ CREATE TABLE mensagens (
     id_usuario_envio UUID REFERENCES profiles (id) ON DELETE CASCADE
 );
 
-    Observação: Para habilitar o recurso de tempo real, ative o Realtime na tabela mensagens no painel do Supabase.
+Observação: Para habilitar o recurso de tempo real, ative o Realtime na tabela mensagens no painel do Supabase. No painel do Supabase, vá até Database > Replication e habilite o Realtime para essa tabela.
+6. Tabela: rating
 
-Tabela: rating
+Crie a tabela de ratings para serviços:
 
 CREATE TABLE rating (
     id SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -208,85 +219,111 @@ CREATE TABLE rating (
 );
 
 ⚠️ Observações Importantes
+Ordem de Execução
 
-    Ordem de Execução:
-        Execute primeiro o script para a tabela profiles, pois outras tabelas dependem dela.
-        Depois, siga a ordem: services, chats, financas, mensagens e rating.
+    Execute primeiro o script para a tabela profiles, pois outras tabelas dependem dela.
+    Depois, siga a ordem: services, chats, financas, mensagens e rating.
 
-    Realtime no Supabase:
-        A funcionalidade de mensagens em tempo real requer que o Realtime esteja ativado para a tabela mensagens.
-        No painel do Supabase, vá até Database > Replication e habilite o Realtime para essa tabela.
+Realtime no Supabase
 
-    Configuração Inicial:
-        Certifique-se de que o Supabase está configurado corretamente e que as variáveis de ambiente necessárias estão no arquivo .env.
+    A funcionalidade de mensagens em tempo real requer que o Realtime esteja ativado para a tabela mensagens.
+    No painel do Supabase, vá até Database > Replication e habilite o Realtime para essa tabela.
 
-Esses scripts ajudam a configurar o ambiente necessário para rodar o projeto. Se precisar de mais ajustes ou ajuda, é só avisar!
+Configuração Inicial
 
-além dos seguintes scripts para conversa entre as tabelas durante a autenticação e permissões dos usuários de alterar e apagar dados:
+    Certifique-se de que o Supabase está configurado corretamente e que as variáveis de ambiente necessárias estão no arquivo .env.
 
--- Create a table for public profiles
-create table profiles (
-  id uuid references auth.users on delete cascade not null primary key,
-  updated_at timestamp with time zone,
-  username text unique,
-  full_name text,
-  avatar_url text,
-  website text,
+🔐 Scripts para Autenticação e Permissões
 
-  constraint username_length check (char_length(username) >= 3)
+A seguir, estão os scripts para configurar a autenticação de usuários e permissões para que possam interagir com os dados:
+1. Criação da Tabela de Perfis Públicos
+
+CREATE TABLE profiles (
+  id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL PRIMARY KEY,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  username TEXT UNIQUE,
+  full_name TEXT,
+  avatar_url TEXT,
+  website TEXT,
+  CONSTRAINT username_length CHECK (CHAR_LENGTH(username) >= 3)
 );
--- Set up Row Level Security (RLS)
--- See https://supabase.com/docs/guides/auth/row-level-security for more details.
-alter table profiles
-  enable row level security;
 
-create policy "Public profiles are viewable by everyone." on profiles
-  for select using (true);
+2. Ativação do Row Level Security (RLS)
 
-create policy "Users can insert their own profile." on profiles
-  for insert with check ((select auth.uid()) = id);
+Ative o RLS (Row Level Security) para garantir que os usuários só possam acessar seus próprios dados:
 
-create policy "Users can update own profile." on profiles
-  for update using ((select auth.uid()) = id);
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
--- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
--- See https://supabase.com/docs/guides/auth/managing-user-data#using-triggers for more details.
-create function public.handle_new_user()
-returns trigger
-set search_path = ''
-as $$
-begin
-  insert into public.profiles (id, full_name, avatar_url)
-  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
-  return new;
-end;
-$$ language plpgsql security definer;
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
+3. Políticas de Acesso para Perfis
 
--- Set up Storage!
-insert into storage.buckets (id, name)
-  values ('avatars', 'avatars');
+Defina as permissões para usuários autenticados e suas interações com seus próprios perfis:
 
--- Set up access controls for storage.
--- See https://supabase.com/docs/guides/storage#policy-examples for more details.
-create policy "Avatar images are publicly accessible." on storage.objects
-  for select using (bucket_id = 'avatars');
+-- Política de acesso para visualização de perfis públicos
+CREATE POLICY "Public profiles are viewable by everyone." ON profiles
+  FOR SELECT USING (true);
 
-create policy "Anyone can upload an avatar." on storage.objects
-  for insert with check (bucket_id = 'avatars');
+-- Política de inserção de perfil por usuários autenticados
+CREATE POLICY "Users can insert their own profile." ON profiles
+  FOR INSERT WITH CHECK ((SELECT auth.uid()) = id);
 
-CREATE
-OR REPLACE FUNCTION public.handle_new_user () RETURNS TRIGGER
-SET
-  search_path = '' AS $$
-begin
-   insert into public.profiles (id, full_name, avatar_url, username)
-   values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'username');
-   return new;
-end; 
+-- Política de atualização de perfil por usuários autenticados
+CREATE POLICY "Users can update own profile." ON profiles
+  FOR UPDATE USING ((SELECT auth.uid()) = id);
+
+4. Função para Criação Automática de Perfil ao Registrar Novo Usuário
+
+Esta função cria automaticamente um perfil para cada novo usuário que se registra no Supabase:
+
+CREATE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+SET SEARCH_PATH = ''
+AS $$
+BEGIN
+  INSERT INTO public.profiles (id, full_name, avatar_url)
+  VALUES (NEW.id, NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'avatar_url');
+  RETURN NEW;
+END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-E nas policies devem criar para a tabela mensagem uma de permissão total de insert (para usuários autenticados) e uma de select para todos os usuários,
-na tabela profiles deve existir uma de delete, select, insert, e update para que os usuários possam alterar seu próprio perfil.
+5. Trigger para Criar Perfil ao Registrar Novo Usuário
+
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+6. Configuração de Armazenamento de Avatares
+
+Crie um bucket de armazenamento para avatares de usuários e configure as permissões de acesso:
+
+-- Criação do bucket de avatares
+INSERT INTO storage.buckets (id, name)
+  VALUES ('avatars', 'avatars');
+
+-- Permissão de acesso para os avatares
+CREATE POLICY "Avatar images are publicly accessible." ON storage.objects
+  FOR SELECT USING (bucket_id = 'avatars');
+
+-- Permissão para usuários enviarem avatares
+CREATE POLICY "Anyone can upload an avatar." ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'avatars');
+
+💬 Permissões de Mensagens
+
+Configure permissões para a tabela de mensagens:
+
+-- Permissões de mensagens para usuários autenticados
+CREATE POLICY "Authenticated users can insert messages." ON mensagens
+  FOR INSERT USING (auth.uid() IS NOT NULL);
+
+-- Permissões para selecionar mensagens
+CREATE POLICY "Everyone can view messages." ON mensagens
+  FOR SELECT USING (true);
+
+Permissões de Perfil
+
+    Delete: Somente o usuário proprietário pode deletar seu perfil.
+    Select: Todos os usuários podem ver os perfis públicos.
+    Insert: Somente o usuário pode criar seu próprio perfil.
+    Update: Somente o usuário pode atualizar seu próprio perfil.
+
+Esses scripts configuram tanto o banco de dados necessário quanto as permissões de acesso para que os usuários possam interagir com seus dados de forma segura e eficaz.
